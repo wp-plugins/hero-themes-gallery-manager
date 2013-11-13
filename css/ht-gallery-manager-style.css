@@ -5,6 +5,15 @@
 	font-size: 120%;
 }
 
+.ht-gallery-manager-loading span.spinner{
+	display: block;
+	float: none;
+	text-indent: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 140px;
+}
+
 .ht-gallery-manager-gallery-empty{
 	display: none;
 	width: 100%;
@@ -21,6 +30,14 @@ ol#ht-gallery-manager-list {
 }
 
 /* VIEWS */
+
+ol#ht-gallery-manager-list li span.spinner{
+	display: block;
+	float: left;
+	margin-left: 65px;
+	margin-top: 65px;
+}
+
 
 ol#ht-gallery-manager-list.stamps-view li{
 	display: block;
@@ -68,7 +85,7 @@ ol#ht-gallery-manager-list.details-view li{
 ol#ht-gallery-manager-list.details-view li.sortable-placeholder{
 	visibility: visible; 
 	border: 5px dashed #ccc;
-	width: 95%;
+	width: 96%;
 	height: 140px; 
 	display: block;
 }
@@ -78,14 +95,43 @@ ol#ht-gallery-manager-list li .ht-gallery-item-thumbnail {
 	float: left;
 }
 
+ol#ht-gallery-manager-list li .ht-gallery-item-unavailable{
+	width: 150px;
+	height: 150px;
+	border: 1px solid #ccc;
+}
+
+ol#ht-gallery-manager-list li .ht-gallery-item-unavailable p{
+	margin-top: 55px;
+	text-align: center;
+	font-size: 10px;
+}
+
+ol#ht-gallery-manager-list li.starred{
+	background-color: #FFFCCF;
+}
+
+
+ol#ht-gallery-manager-list li.loading-img{
+	
+}
+
+ol#ht-gallery-manager-list li span.spinner{
+	display: none;
+}
+
+ol#ht-gallery-manager-list li.loading-img span.spinner{
+	display: block;
+}
 
 
 /* ATTRIBUTES */
 
 ol#ht-gallery-manager-list.details-view li .ht-gallery-item-attributes {
-	display: block;
-	float: left;
-	padding: 20px;
+	width: 100%;
+	position: absolute;
+	left: 190px;
+	top: 30px;
 }
 
 
@@ -97,22 +143,55 @@ ol#ht-gallery-manager-list.stamps-view li .ht-gallery-item-attributes{
 .ht-gallery-item-attributes label{
 	clear: left;
 	display: block;
+	margin-bottom: 5px;
+	padding-right: 200px;
 }
 
 .ht-gallery-item-attributes label span{
-	width: 200px;
+	width: 30%;
 	float: left;
 	font-weight: bold;
 }
 .ht-gallery-item-attributes label input{
+	width: 60%;
 	float: left;
-	width: 300px
 }
 
-.ht-gallery-item-attributes label input{
-	float: left;
-	width: 300px
+/* STARRED IMAGE */
+ol#ht-gallery-manager-list li .gallery-item-starred-tools{
+	opacity: 0;
+	position: absolute;
+	left: 175px;
+	top: 50px;
 }
+
+ol#ht-gallery-manager-list li:hover .gallery-item-starred-tools{
+	opacity: 1;
+	-webkit-transition: opacity 0.5s ease-in-out;
+	-moz-transition: opacity 0.5s ease-in-out;
+	-ms-transition: opacity 0.5s ease-in-out;
+	-o-transition: opacity 0.5s ease-in-out;
+	transition: opacity 0.5s ease-in-out;
+}
+
+ol#ht-gallery-manager-list li .star-ht-gallery-item{
+	display: inline;
+	position: absolute;
+	width: 22px;
+	height: 22px;
+	bottom: 5px;
+	right: 5px;
+	padding: 5px;
+	background-image: url('../img/sprites.png') ;
+	background-position: -8px -111px;
+}
+
+ol#ht-gallery-manager-list li .star-ht-gallery-item.starred{
+	background-position: -61px -111px;
+}
+
+
+
 
 
 /* EDIT TOOLS */
@@ -143,19 +222,19 @@ ol#ht-gallery-manager-list li .delete-ht-gallery-item{
 	right: 5px;
 	padding: 5px;
 	background-image: url('../img/sprites.png') ;
-	background-position: -61px -161px;
+	background-position: -61px -61px;
 }
 
 ol#ht-gallery-manager-list li .edit-ht-gallery-item{
 	display: inline;
 	position: absolute;
-	bottom: 50px;
+	bottom: 42px;
 	right: 5px;
 	width: 22px;
 	height: 22px;
 	padding: 5px;
 	background-image: url('../img/sprites.png');
-	background-position: -12px -160px;
+	background-position: -12px -60px;
 }
 
 ol#ht-gallery-manager-list li a{
@@ -278,6 +357,55 @@ ul.ht-gallery-manager-bar li.ht-gallery-manager-gallery-details {
 	color: #8d8d8d;
 	text-shadow: #fff 0 1px 0;
 	margin-top: -5px; 
+}
+
+/* UPLOAD */
+
+.ht-drop-files .drag-drop-inside {
+	width: 100%;
+	margin: 5px auto 5px;
+	border: 3px dashed #ccc;
+	padding: 40px 0 40px 0;
+	font-size: 20px;
+	text-align: center;
+	color: #aaa;
+}
+
+.ht-drop-files .drag-drop-inside.drag-over {
+	background-color: #97ADD5;
+	border: 3px dashed #fff;
+	color: #fff;
+}
+
+.ht-drop-files .drag-drop-inside.drag-over p{
+	color: #fff;
+}
+
+.ht-drop-files .plupload.html5 {
+	top: 0;
+}
+
+.ht-gallery-loading-bar {
+	display: block;
+	background-color: #EDF7FF;
+	height: 20px;
+	border: 1px solid #ccc;
+	margin-top: 65px;
+}
+
+ol.stamps-view .ht-gallery-loading-bar {
+}
+
+ol.details-view .ht-gallery-loading-bar {
+	margin-right: 25px;
+}
+
+.ht-gallery-loading-bar-inner {
+	display: block;
+	float: right;
+	height: 20px;	
+	width: 100%;
+	background-color: white;
 }
 
 
