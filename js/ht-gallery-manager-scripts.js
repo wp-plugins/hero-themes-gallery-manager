@@ -16,7 +16,6 @@ jQuery(document).ready(function($){
         return;
     }
 
-
     // create the media frame with options if it doesn't exist
     heroGalleryManagementTool = wp.media.frames.heroGalleryManagementTool = wp.media({
         className: 'media-frame tgm-media-frame',
@@ -621,7 +620,7 @@ jQuery(document).ready(function($){
         if(event.target === this) {
             $( this ).addClass('drag-over');
         }  
-    });
+    }); 
 
     //drag leave or mouse drop event
     $('.ht-drop-files .drag-drop-inside').on('dragleave drop', function(event) {

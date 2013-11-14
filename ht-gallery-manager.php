@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Replacement Gallery Manager
 *	Author: Hero Themes
-*	Version: 1.2
+*	Version: 1.2.1
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -213,7 +213,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		public function render_hero_gallery_side_meta_box_content( $post ) {
 			_e( 'Want even more from your Hero Gallery?', 'hero-gallery-manager' );
 			echo '<br/><br/>';
-			_e( sprintf( 'Choose a %1$sHero Theme%2$s', '<a href="'.HERO_THEMES_REF_LINK.'">', '</a>' ), 'hero-gallery-manager' );
+			_e( sprintf( 'Choose a %1$sHero Theme%2$s for even more power.', '<a href="'.HERO_THEMES_REF_LINK.'">', '</a>' ), 'hero-gallery-manager' );
 			echo '<br/><br/>';				
 			echo '<a href="'.HERO_THEMES_REF_LINK.'" title="Hero Themes" class="button button-primary button-large">';
 			_e( 'Learn More', 'hero-gallery-manager' );
