@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Replacement Gallery Manager
 *	Author: Hero Themes
-*	Version: 1.2.1
+*	Version: 1.3
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -18,11 +18,14 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		//constructor
 		function __construct(){
 			add_action( 'init', array( $this,  'register_ht_gallery_post_cpt' ) );
+			add_action( 'init', array( $this,  'register_ht_gallery_category_taxonomy' ) );
+	
 			add_action( 'add_meta_boxes', array( $this, 'add_hero_gallery_meta_box' ) );
 			add_action( 'save_post', array( $this, 'save_hero_gallery' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_ht_gallery_manager_scripts_and_styles' ) );
             add_action( 'media_buttons', array( $this, 'ht_add_form_button'), 20 );
 			add_filter( 'media_view_settings', array($this, 'ht_gallery_media_view_settings'), 10, 2 );
+			add_action( 'admin_init', array( $this, 'show_all_gallery_posts' ) );
 			add_shortcode( 'ht_gallery', array( $this , 'ht_gallery_shortcode' ) );
 			add_filter( 'get_ht_galleries', array ( $this, 'ht_get_galleries' ) );
 			//set the meta key value
@@ -33,6 +36,40 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 		public static function get_meta_key_value(){
 			return $this->meta_value_key;
+		}
+
+		/**
+		* Registers the ht_gallery_post category taxonomy
+		*/
+		function register_ht_gallery_category_taxonomy()  {
+
+			$labels = array(
+				'name'                       => _x( 'Gallery Category', 'Taxonomy General Name', 'ht-gallery-manager' ),
+				'singular_name'              => _x( 'Gallery Category', 'Taxonomy Singular Name', 'ht-gallery-manager' ),
+				'menu_name'                  => __( 'Gallery Categories', 'ht-gallery-manager' ),
+				'all_items'                  => __( 'All Gallery Categories', 'ht-gallery-manager' ),
+				'parent_item'                => __( 'Parent Gallery Category', 'ht-gallery-manager' ),
+				'parent_item_colon'          => __( 'Parent Gallery Category:', 'ht-gallery-manager' ),
+				'new_item_name'              => __( 'New Gallery Category', 'ht-gallery-manager' ),
+				'add_new_item'               => __( 'Add New Gallery Category', 'ht-gallery-manager' ),
+				'edit_item'                  => __( 'Edit Gallery Category', 'ht-gallery-manager' ),
+				'update_item'                => __( 'Update Gallery Category', 'ht-gallery-manager' ),
+				'separate_items_with_commas' => __( 'Separate Gallery Categories with commas', 'ht-gallery-manager' ),
+				'search_items'               => __( 'Search Gallery Categories', 'ht-gallery-manager' ),
+				'add_or_remove_items'        => __( 'Add or remove categories', 'ht-gallery-manager' ),
+				'choose_from_most_used'      => __( 'Choose from the most used categories', 'ht-gallery-manager' ),
+			);
+			$args = array(
+				'labels'                     => $labels,
+				'hierarchical'               => true,
+				'public'                     => true,
+				'show_ui'                    => true,
+				'show_admin_column'          => true,
+				'show_in_nav_menus'          => true,
+				'show_tagcloud'              => true,
+			);
+			register_taxonomy( 'ht_gallery_category', 'ht_gallery_post', $args );
+
 		}
 
 		/**
@@ -69,7 +106,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				'has_archive'        => true,
 				'hierarchical'       => false,
 				'menu_position'      => null,
-				'supports'           => array( 'title', 'author' )
+				'supports'           => array( 'title', 'editor' )
 			);
 
 		  register_post_type( 'ht_gallery_post', $args );
@@ -80,8 +117,22 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		 * Adds the hero gallery meta box container.
 		 */
 		public function add_hero_gallery_meta_box() {
+			global $_wp_post_type_features;
+			if (isset($_wp_post_type_features['ht_gallery_post']['editor']) && $_wp_post_type_features['ht_gallery_post']['editor']) {
+				unset($_wp_post_type_features['ht_gallery_post']['editor']);
+				add_meta_box(
+					'description_section',
+					__('Gallery Description', 'ht-gallery-manager'),
+					array( $this, 'inner_editor_box' ),
+					'ht_gallery_post', 'normal', 'low'
+				);
+			}
+
+			//post excerpt
+			add_meta_box('postexcerpt', __( 'Gallery Excerpt', 'ht-gallery-manager' ), 'post_excerpt_meta_box', 'ht_gallery_post', 'normal', 'low');
+
 			add_meta_box(
-				'hero_gallery_meta_shortocode',
+				'hero_gallery_meta_shortcode',
 				__( 'Hero Gallery Shortcode Information', 'ht-gallery-manager' ),
 				array( $this, 'render_hero_gallery_meta_box_shortcode_info' ),
 				'ht_gallery_post',
@@ -96,6 +147,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				'normal',
 				'high'
 				);
+
+	
 			//add notice if current theme does not support the hero gallery manager
 			if( !current_theme_supports( 'hero-gallery-manager' ) ){
 				add_meta_box(
@@ -107,6 +160,20 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 					'low'
 					);
 			}
+		}
+
+		/**
+		* the inner custom post box
+		*/
+		function inner_editor_box( $post ) {
+			wp_editor( $post->post_content, 'ht_gallery_description' );
+		}
+
+		/**
+		* the inner custom post box
+		*/
+		function inner_excerpt_box( $post ) {
+			wp_editor( $post->post_content, 'ht_gallery_description' );
 		}
 
 		/**
@@ -214,8 +281,9 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			_e( 'Want even more from your Hero Gallery?', 'hero-gallery-manager' );
 			echo '<br/><br/>';
 			_e( sprintf( 'Choose a %1$sHero Theme%2$s for even more power.', '<a href="'.HERO_THEMES_REF_LINK.'">', '</a>' ), 'hero-gallery-manager' );
+
 			echo '<br/><br/>';				
-			echo '<a href="'.HERO_THEMES_REF_LINK.'" title="Hero Themes" class="button button-primary button-large">';
+			echo '<a href="' . HERO_THEMES_REF_LINK . '" title="Hero Themes" class="button button-primary button-large">';
 			_e( 'Learn More', 'hero-gallery-manager' );
 			echo '</a>';
 		}
@@ -427,8 +495,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 	            'silverlight_xap_url' => includes_url( 'js/plupload/plupload.silverlight.xap' ),
 	            'filters'             => array(
 	                array(
-	                    'title'      => __( 'Allowed Files', 'rw' ),
-	                    'extensions' => '*'
+	                    'title'      => __( 'Image Files', 'ht-gallery-manager' ),
+	                    'extensions' => 'jpg,gif,png'
 	                )
 	            ),
 	            'multipart'           => true,
@@ -478,8 +546,11 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* Add the Hero Gallery button to the post editor
 		*/
 		function ht_add_form_button(){
-			echo '<a href="#TB_inline?width=600&height=550&inlineId=select-hero-gallery-dialog" class="thickbox button" id="add_ht_gallery" title="' . __("Add Hero Gallery", 'hero-gallery-manager') . '"><span class="ht-gallery-media-icon "></span> ' . __("Add Hero Gallery", "hero-gallery-manager") . '</a>';
-			add_action( 'admin_footer', array ( $this, 'ht_select_hero_gallery_form' ) );
+			$page = get_current_screen();
+			if( isset($page) && $page->id!='ht_gallery_post' ){
+				echo '<a href="#TB_inline?width=600&height=550&inlineId=select-hero-gallery-dialog" class="thickbox button" id="add_ht_gallery" title="' . __("Add Hero Gallery", 'hero-gallery-manager') . '"><span class="ht-gallery-media-icon "></span> ' . __("Add Hero Gallery", "hero-gallery-manager") . '</a>';
+				add_action( 'admin_footer', array ( $this, 'ht_select_hero_gallery_form' ) );
+			}			
 		}
 
 		/**
@@ -532,6 +603,23 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
                  </style>';
 
 		}
+
+		function show_all_gallery_posts($query) {
+		    if(function_exists('get_current_screen'))
+		    	$screen = get_current_screen();
+
+		    //var_dump($screen);
+			if( $screen && $screen->post_type == 'ht_gallery_post' && $screen->base == 'edit' ) {
+		        //$query->query_vars['orderby'] = 'meta_value';
+		        //-1 doesn't work here, need to use large int
+		        $query->query_vars['posts_per_page'] = 10000000000;
+		        //$query->query['posts_per_page'] = 40;
+		        var_dump($query);
+		    }
+		}
+
+
+
 
 
 	} //end class HT_Gallery_Manager
