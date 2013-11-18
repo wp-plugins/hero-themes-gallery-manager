@@ -3,7 +3,7 @@ Contributors: herothemes
 Tags: images, gallery, manager, photos, photography, photo
 Requires at least: 3.5
 Tested up to: 3.7.1
-Stable tag: 1.2.1
+Stable tag: 1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -49,6 +49,10 @@ A. Simply hit the refresh button and the images will be re-loaded.
 
 
 == Changelog ==
+
+= 1.3 =
+
+Gallery category, editor and excerpt.
 
 = 1.2 =
 
