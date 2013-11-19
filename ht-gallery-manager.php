@@ -2,9 +2,9 @@
 /*
 *	Plugin Name: Hero Themes Gallery Manager
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
-*	Description: A Replacement Gallery Manager
+*	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.3
+*	Version: 1.4
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -24,10 +24,14 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			add_action( 'save_post', array( $this, 'save_hero_gallery' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_ht_gallery_manager_scripts_and_styles' ) );
             add_action( 'media_buttons', array( $this, 'ht_add_form_button'), 20 );
+            add_action( 'wp_ajax_save_ht_gallery_order', array( $this, 'save_ht_gallery_order_ajax' ) );
+            
 			add_filter( 'media_view_settings', array($this, 'ht_gallery_media_view_settings'), 10, 2 );
-			add_action( 'admin_init', array( $this, 'show_all_gallery_posts' ) );
+			add_action( 'pre_get_posts', array( $this, 'show_all_gallery_posts' ) );
 			add_shortcode( 'ht_gallery', array( $this , 'ht_gallery_shortcode' ) );
-			add_filter( 'get_ht_galleries', array ( $this, 'ht_get_galleries' ) );
+			add_filter( 'manage_ht_gallery_post_posts_columns', array( $this, 'ht_gallery_columns'), 10, 1 );
+			add_filter( 'manage_ht_gallery_post_posts_custom_column', array( $this, 'ht_gallery_custom_column'), 10, 2 );
+			add_filter( 'get_ht_galleries', array( $this, 'ht_get_galleries' ) );
 			//set the meta key value
 			$this->meta_value_key = '_ht_gallery_images';
 			$this->starred_meta_value_key = '_ht_gallery_starred_image';
@@ -106,7 +110,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				'has_archive'        => true,
 				'hierarchical'       => false,
 				'menu_position'      => null,
-				'supports'           => array( 'title', 'editor' )
+				'supports'           => array( 'title', 'editor', 'page-attributes' )
 			);
 
 		  register_post_type( 'ht_gallery_post', $args );
@@ -247,7 +251,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		 * @param WP_Post $post The post object.
 		 */
 		public function render_hero_gallery_meta_box_shortcode_info( $post ) {
-			printf( __( 'To use this Hero Gallery enter the shortcode <b>[ht_gallery id="%s" name="%s"]</b> in your post or page', 'ht-gallery-manager' ), $post->ID, $post->post_title );
+			printf( __( 'To use this Hero Gallery enter the shortcode <b>[ht_gallery id="%s" name="%s"]</b> in your post or page or use the Insert Hero Gallery button.', 'ht-gallery-manager' ), $post->ID, $post->post_title );
 		}
 
 
@@ -394,13 +398,18 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		function enqueue_ht_gallery_manager_scripts_and_styles(){
 			//localize?
 			$screen = get_current_screen();
+
 			if( $screen->post_type == 'ht_gallery_post' && $screen->base == 'post' ) {
 				wp_enqueue_script('plupload-all'); 
 				wp_enqueue_script( 'ht-gallery-manager-scripts', plugins_url( 'js/ht-gallery-manager-scripts.js', __FILE__ ), array( 'jquery' , 'jquery-effects-core', 'jquery-ui-draggable', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-sortable' ), 1.1, true );
 				wp_enqueue_style( 'ht-gallery-manager-style', plugins_url( 'css/ht-gallery-manager-style.css', __FILE__ ));
 				wp_localize_script( 'ht-gallery-manager-scripts', 'framework', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
 				$this->uploader_localize();
-			} else {
+			} else if( $screen->post_type == 'ht_gallery_post' && $screen->base == 'edit' ) {
+				wp_enqueue_script( 'ht-gallery-sorter-scripts', plugins_url( 'js/ht-gallery-sorter-scripts.js', __FILE__ ), array( 'jquery' , 'jquery-effects-core', 'jquery-ui-draggable', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-sortable' ), 1.0, true );
+				wp_localize_script( 'ht-gallery-sorter-scripts', 'framework', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+				wp_enqueue_style( 'ht-gallery-sorter-style', plugins_url( 'css/ht-gallery-sorter-style.css', __FILE__ ));
+
 			}
 		}
 	 
@@ -522,6 +531,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				'category'         => '',
 				'orderby'          => 'post_date',
 				'order'            => 'DESC',
+				'posts_per_page'   => -1,
 				'include'          => '',
 				'exclude'          => '',
 				'meta_key'         => '',
@@ -546,18 +556,19 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* Add the Hero Gallery button to the post editor
 		*/
 		function ht_add_form_button(){
-			$page = get_current_screen();
-			if( isset($page) && $page->id!='ht_gallery_post' ){
+			$page = is_admin() ? get_current_screen() : null;
+
+			if( $page == null || ( isset($page) && $page->id!='ht_gallery_post'  ) ){
 				echo '<a href="#TB_inline?width=600&height=550&inlineId=select-hero-gallery-dialog" class="thickbox button" id="add_ht_gallery" title="' . __("Add Hero Gallery", 'hero-gallery-manager') . '"><span class="ht-gallery-media-icon "></span> ' . __("Add Hero Gallery", "hero-gallery-manager") . '</a>';
 				add_action( 'admin_footer', array ( $this, 'ht_select_hero_gallery_form' ) );
-			}			
+			}		
 		}
 
 		/**
 		* Displays the Insert a Hero Gallery Selector
 		*/
 		function ht_select_hero_gallery_form(){
-				$this->ht_select_hero_gallery_styles();
+				$this->ht_select_hero_gallery_scripts_and_styles();
 
 			?>
 				<div id="select-hero-gallery-dialog" style="display:none">
@@ -565,8 +576,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 					<p><?php _e('Add a Hero Gallery to the current post', 'hero-gallery-manager'); ?></p>
 			<?php
 				$ht_galleries = apply_filters( 'get_ht_galleries', array() );
-
 			?>	
+
 					 
 					<select name="ht-gallery-select" id="ht-gallery-select">
 			<?php
@@ -578,6 +589,22 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			?>
 					</select>
 					<br/><br/>
+			<?php
+				foreach ($ht_galleries as $gallery) {
+						$gallery_id = $gallery['id'];
+						echo '<div class="ht-gallery-select-preview" id="ht-gallery-select-preview-' . $gallery_id . '" data-gallery-id=' . $gallery_id . '>';
+						//echo '<p>' . __('Preview' , 'ht-gallery-manager' ) . '</p>';
+						$img = HT_Gallery_Manager::get_starred_image_src( $gallery_id );
+						if( $img ){
+							echo '<img src="' . $img[0].'" width="' . $img[1].'" height="' . $img[1].'" />';
+						} else {
+							
+						}
+						echo '<div class="Image Count">' . sprintf( __('%d Images in Gallery' , 'ht-gallery-manager' ), HT_Gallery_Manager::get_hero_gallery_image_count( $gallery_id )  ). '</div>';
+						echo '</div> <!-- ht-gallery-select-preview -->';
+				}
+
+			?>		
 					<a href="#" id="insert-ht-gallery" class="button button-primary button-large" onClick="window.send_to_editor( '[ht_gallery id=&quot;' + jQuery('#ht-gallery-select').val() + '&quot; name=&quot;' + jQuery('#ht-gallery-select').children('option').filter(':selected').text() + '&quot;]' ); jQuery('#select-hero-gallery-dialog').fadeOut();">Add</a>
 					<a href="#" id="cancel-insert-ht-gallery" class="button  button-large" onClick="window.send_to_editor( '' ); jQuery('#select-hero-gallery-dialog').fadeOut();">Cancel</a>
 					 
@@ -586,9 +613,11 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		}
 
 		/*
-		* Enqueue styles for select box in editor
+		* Enqueue scripts styles for select box in editor
 		*/
-		function ht_select_hero_gallery_styles(){
+		function ht_select_hero_gallery_scripts_and_styles(){
+			wp_enqueue_script( 'ht-gallery-selector-scripts', plugins_url( 'js/ht-gallery-selector-scripts.js', __FILE__ ), array( 'jquery' ), 1.0, true );
+
 			wp_enqueue_style( 'ht-gallery-selector-style', plugins_url( 'css/ht-gallery-selector-style.css', __FILE__ ));
 
 			//custom styles
@@ -605,20 +634,106 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		}
 
 		function show_all_gallery_posts($query) {
+			
 		    if(function_exists('get_current_screen'))
 		    	$screen = get_current_screen();
 
-		    //var_dump($screen);
-			if( $screen && $screen->post_type == 'ht_gallery_post' && $screen->base == 'edit' ) {
-		        //$query->query_vars['orderby'] = 'meta_value';
+		    
+			if( is_admin() && $screen && $screen->post_type == 'ht_gallery_post' && $screen->base == 'edit' ) {
 		        //-1 doesn't work here, need to use large int
-		        $query->query_vars['posts_per_page'] = 10000000000;
-		        //$query->query['posts_per_page'] = 40;
-		        var_dump($query);
+		        $query->set('posts_per_page', '100000');
+		        $query->set('orderby', 'menu_order');
+		        $query->set('order', 'ASC');
+
+		        return $query;
+		    }
+
+
+		}
+
+		function ht_gallery_columns($columns){
+			$preview_columns = array(
+				'prev' => __('Preview', 'ht-gallery-manager')
+			);
+			$order_columns = array(
+				'order' => __('Order', 'ht-gallery-manager')
+			);
+	    	//return array_merge(array_slice($columns, 0, 1), $preview_columns, array_slice($columns, 1), $order_columns);
+	    	return array_merge($columns, $preview_columns, $order_columns);
+		}
+
+		function ht_gallery_custom_column( $column, $post_id ) {
+			global $post;
+		    switch ( $column ) {
+
+		        case 'order' :
+		            echo '<div class="ht-gallery post-order" data-post-id="' . $post->ID . '" data-menu-order="' . $post->menu_order . '">' . $post->menu_order . '</div>';
+		            break;
+		        case 'prev':
+		        	echo HT_Gallery_Manager::get_starred_image_thumbnail( $post->ID, array(40, 40) );
+		        	break;
 		    }
 		}
 
+		function save_ht_gallery_order_ajax(){
 
+			$ht_order_array =  $_POST['gallery_order'];
+
+			foreach ($ht_order_array as $key => $current_gallery) {
+				//filter
+				$post_id = intval($current_gallery['postID']);
+				$menu_order = intval($current_gallery['menuOrder']);
+				$post_update = array(
+						'ID' => $post_id,
+						'menu_order' => $menu_order
+					);
+				wp_update_post( $post_update );
+
+			}
+
+			echo json_encode('updated gallery order sucessfully');
+
+			die(); // this is required to return a proper result
+		}
+
+		/**
+		* Get the attachment id of the starred image (or first image from a set) for a given id
+		*
+		* @param $post_id The post id of the Hero Gallery
+		*/
+		public function get_starred_image($gallery_post_id){
+			$starred_image = '';
+
+			//get the post meta for starred image
+			$starred_image = get_post_meta( $gallery_post_id, $this->starred_meta_value_key, true );
+
+			//if no starred image set use the first image in the gallery
+			if( $starred_image == ''){
+				$gallery_ids = get_post_meta( $gallery_post_id, $this->meta_value_key, true );
+				$gallery_array = $gallery_ids != '' ? explode( ',', $gallery_ids ) : array();
+				if( count( $gallery_array ) > 0 ){
+					$starred_image = $gallery_array[0];
+				}
+			}
+
+			return $starred_image;
+		}
+
+		public function get_starred_image_thumbnail($gallery_post_id, $size = 'thumbnail'){
+			return wp_get_attachment_image( HT_Gallery_Manager::get_starred_image( $gallery_post_id ) , $size  );
+		}
+
+		public function get_starred_image_src($gallery_post_id, $size = 'thumbnail'){
+			return wp_get_attachment_image_src( HT_Gallery_Manager::get_starred_image( $gallery_post_id ) , $size  );
+		}
+
+		public function get_hero_gallery_image_count($gallery_post_id){
+			$gallery_ids = get_post_meta( $gallery_post_id, $this->meta_value_key, true );
+			$gallery_array = $gallery_ids != '' ? explode( ',', $gallery_ids ) : array();
+			return count( $gallery_array );
+		}
+
+		
 
 
 

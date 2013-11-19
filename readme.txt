@@ -3,15 +3,15 @@ Contributors: herothemes
 Tags: images, gallery, manager, photos, photography, photo
 Requires at least: 3.5
 Tested up to: 3.7.1
-Stable tag: 1.3
+Stable tag: 1.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Hero Themes Gallery Manager is an enhanced gallery manager for WordPress
+Hero Themes Gallery Manager is an enhanced drag and drop gallery manager for WordPress
 
 == Description ==
 
-The **Ultimate** gallery manager that combines the best features of the WordPress media manager with a simplified and flexible gallery management tool. Create and manage your galleries with Hero Themes Gallery Manager. Drag and drop re-ordering, uploads and simple, powerful gallery views.
+The **Ultimate** gallery manager that combines the best features of the WordPress media manager with a simplified and flexible gallery management tool. Create and manage your galleries with Hero Themes Gallery Manager. Drag and drop re-ordering, uploads, editing  and simple, powerful gallery views.
 
 **Video Demonstration**
 
@@ -25,9 +25,10 @@ A short video demonstrating the improved workflow benefits using Hero Gallery Ma
 It's easy to get started
 
 1. Upload `ht-gallery-manager` to the `/wp-content/plugins/` directory or goto Plugins>Add New and search for Hero Themes Gallery Manager.
-1. Activate the plugin through the 'Plugins' menu in WordPress.
-2. Under the new Hero Galleries menu option select New Hero Gallery.
-3. Be sure to click publish/update to save your Hero Gallery, then copy the shortcode into your post or page where you want the Hero Gallery to appear or select `Add Hero Gallery` from the target post or page.
+2. Activate the plugin through the 'Plugins' menu in WordPress.
+3. Under the new Hero Galleries menu option select New Hero Gallery.
+4. Be sure to click publish/update to save your Hero Gallery, then copy the shortcode into your post or page where you want the Hero Gallery to appear or select `Add Hero Gallery` from the target post or page.
+5. You can star an image, which works in a similar way to featured images. These will appear as a cover image when using a supporting theme.
 
 == Frequently Asked Questions ==
 
@@ -49,6 +50,10 @@ A. Simply hit the refresh button and the images will be re-loaded.
 
 
 == Changelog ==
+
+= 1.4 =
+
+Reorder Hero Galleries with Menu Order, functional improvements.
 
 = 1.3 =
 

@@ -479,7 +479,9 @@ jQuery(document).ready(function($){
                 action      : htGalleryUploaderInit.multipart_params.action,
                 imgid       : uploaderId,
                 galleryName : $( '#' + uploaderId + '-gallery-name' ).val(),
-                parentId    : $( "input#post_ID" ).val() || 0
+                post_id    : $( "input#post_ID" ).val() || 0,
+                short       : false,
+                long        : true
             }
         };
 
