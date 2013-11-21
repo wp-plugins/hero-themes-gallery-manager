@@ -177,17 +177,17 @@ ol#ht-gallery-manager-list li:hover .gallery-item-starred-tools{
 ol#ht-gallery-manager-list li .star-ht-gallery-item{
 	display: inline;
 	position: absolute;
-	width: 22px;
-	height: 22px;
-	bottom: 5px;
-	right: 5px;
+	width: 20px;
+	height: 20px;
+	bottom: 15px;
+	right: 0;
 	padding: 5px;
 	background-image: url('../img/sprites.png') ;
-	background-position: -8px -111px;
+	background-position: -9px -112px;
 }
 
 ol#ht-gallery-manager-list li .star-ht-gallery-item.starred{
-	background-position: -61px -111px;
+	background-position: -62px -112px;
 }
 
 
@@ -216,36 +216,37 @@ ol#ht-gallery-manager-list li:hover .gallery-item-edit-tools{
 ol#ht-gallery-manager-list li .delete-ht-gallery-item{
 	display: inline;
 	position: absolute;
-	width: 22px;
-	height: 22px;
+	width: 20px;
+	height: 20px;
 	bottom: 5px;
-	right: 5px;
+	right: 0;
 	padding: 5px;
 	background-image: url('../img/sprites.png') ;
-	background-position: -61px -61px;
+	background-position: -63px -63px;
 }
 
 ol#ht-gallery-manager-list li .edit-ht-gallery-item{
 	display: inline;
 	position: absolute;
 	bottom: 42px;
-	right: 5px;
-	width: 22px;
-	height: 22px;
+	right: 0;
+	width: 20px;
+	height: 20px;
 	padding: 5px;
 	background-image: url('../img/sprites.png');
-	background-position: -12px -60px;
+	background-position: -13px -63px;
 }
 
-ol#ht-gallery-manager-list li a{
+ol#ht-gallery-manager-list li a {
 	text-decoration: none;
-	background-color: #D5D5D5;
-	border-radius: 20px;
+	background-color: #f4f4f4;
+	border:1px solid #bbbbbb;
+	border-radius: 99%;
 	line-height: 5px;
 }
 
 ol#ht-gallery-manager-list li a:hover{
-	background-color: #ADA9A9;
+	background-color: #f0f0f0;
 }
 
 ol#ht-gallery-manager-list li img:hover{

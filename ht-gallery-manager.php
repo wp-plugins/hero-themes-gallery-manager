@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.4
+*	Version: 1.7
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -24,7 +24,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			add_action( 'save_post', array( $this, 'save_hero_gallery' ) );
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_ht_gallery_manager_scripts_and_styles' ) );
             add_action( 'media_buttons', array( $this, 'ht_add_form_button'), 20 );
-            add_action( 'wp_ajax_save_ht_gallery_order', array( $this, 'save_ht_gallery_order_ajax' ) );
+            add_action( 'wp_ajax_save_ht_gallery_order', array( $this, 'save_ht_gallery_menu_order_ajax' ) );
+            add_action( 'wp_ajax_save_ht_gallery_images', array( $this, 'save_ht_gallery_images_ajax' ) );
             
 			add_filter( 'media_view_settings', array($this, 'ht_gallery_media_view_settings'), 10, 2 );
 			add_action( 'pre_get_posts', array( $this, 'show_all_gallery_posts' ) );
@@ -32,14 +33,39 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			add_filter( 'manage_ht_gallery_post_posts_columns', array( $this, 'ht_gallery_columns'), 10, 1 );
 			add_filter( 'manage_ht_gallery_post_posts_custom_column', array( $this, 'ht_gallery_custom_column'), 10, 2 );
 			add_filter( 'get_ht_galleries', array( $this, 'ht_get_galleries' ) );
+
+			//add to menu items
+			add_action( 'admin_head-nav-menus.php', array( $this, 'ht_gallery_menu_metabox' ) );
+			add_filter( 'wp_get_nav_menu_items', array( $this,'ht_gallery_archive_menu_filter'), 10, 3 );
+
+			//activation hook
+			register_activation_hook(__FILE__, array( $this, 'ht_gallery_flush_rules' ) );
+
 			//set the meta key value
 			$this->meta_value_key = '_ht_gallery_images';
 			$this->starred_meta_value_key = '_ht_gallery_starred_image';
 			$this->view_value_key = '_ht_gallery_view';
+			
+
+			include_once('php/ht-gallery-manager-settings.php');
 		}
+
 
 		public static function get_meta_key_value(){
 			return $this->meta_value_key;
+		}
+
+
+		/**
+		* Flush the rewrite rules - run when plugin is activated
+		*/
+		function ht_gallery_flush_rules(){
+			//defines the post type and taxonomy so the rules can be flushed.
+			$this->register_ht_gallery_post_cpt();
+			$this->register_ht_gallery_category_taxonomy();
+
+			//and flush the rules.
+			flush_rewrite_rules();
 		}
 
 		/**
@@ -68,6 +94,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				'hierarchical'               => true,
 				'public'                     => true,
 				'show_ui'                    => true,
+				'rewrite'            		 => array( 'slug' => $this->get_default_category_slug() ),
 				'show_admin_column'          => true,
 				'show_in_nav_menus'          => true,
 				'show_tagcloud'              => true,
@@ -105,7 +132,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				'show_ui'            => true,
 				'show_in_menu'       => true,
 				'query_var'          => true,
-				'rewrite'            => array( 'slug' => 'herogallery' ),
+				'rewrite'            => array( 'slug' => $this->get_default_post_slug() ),
 				'capability_type'    => 'post',
 				'has_archive'        => true,
 				'hierarchical'       => false,
@@ -116,9 +143,43 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		  register_post_type( 'ht_gallery_post', $args );
 		}
 
+		/**
+		* Get the default post slug
+		*/
+		public function get_default_post_slug(){
+			$gallery_options_array = get_option( 'ht_gallery_manager_options' );
+			$default_slug = 'herogallery';
+			if( $gallery_options_array ){
+				if( is_array($gallery_options_array) && array_key_exists( 'post_slug', $gallery_options_array ) ){
+					$user_defined_slug = $gallery_options_array['post_slug'];
+					if($user_defined_slug!=''){
+						$default_slug = $user_defined_slug;
+					}
+				}
+			}
+			return $default_slug;
+		}
 
 		/**
-		 * Adds the hero gallery meta box container.
+		* Get the default category slug
+		*/
+		public function get_default_category_slug(){
+			$gallery_options_array = get_option( 'ht_gallery_manager_options' );
+			$default_slug = 'herogalleries';
+			if( $gallery_options_array ){
+				if( is_array($gallery_options_array) && array_key_exists( 'category_slug', $gallery_options_array ) ){
+					$user_defined_slug = $gallery_options_array['category_slug'];
+					if($user_defined_slug!=''){
+						$default_slug = $user_defined_slug;
+					}
+				}
+			}
+			return $default_slug;
+		}
+
+
+		/**
+		 * Adds the hero gallery meta box container
 		 */
 		public function add_hero_gallery_meta_box() {
 			global $_wp_post_type_features;
@@ -167,18 +228,15 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		}
 
 		/**
-		* the inner custom post box
+		* The inner custom post box for the editor - requires content as name.
+		*
+		* @param $post The Post object.
 		*/
 		function inner_editor_box( $post ) {
-			wp_editor( $post->post_content, 'ht_gallery_description' );
+			wp_editor( $post->post_content, 'content' );
 		}
 
-		/**
-		* the inner custom post box
-		*/
-		function inner_excerpt_box( $post ) {
-			wp_editor( $post->post_content, 'ht_gallery_description' );
-		}
+		
 
 		/**
 		 * Save the hero gallery meta when the post is saved.
@@ -233,6 +291,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			//update the view in the user meta
 			$view = sanitize_text_field( $_POST[$this->view_value_key] );
 			update_user_meta( get_current_user_id(), $this->view_value_key.$post_id, $view );
+
 
 			// Sanitize the user input.
 			$ht_gallery_items = sanitize_text_field( $_POST[$this->meta_value_key] );
@@ -295,7 +354,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 
 		/**
-		* Display the hero gallery metabox
+		* Display the Hero Gallery metabox
 		*
 		* @param int $post_id The id of the current post
 		*/
@@ -386,7 +445,6 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				
 			</ul>	
 
-
 			</div> <!--hero-gallery-manager-->
 
 			<?php
@@ -403,11 +461,11 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				wp_enqueue_script('plupload-all'); 
 				wp_enqueue_script( 'ht-gallery-manager-scripts', plugins_url( 'js/ht-gallery-manager-scripts.js', __FILE__ ), array( 'jquery' , 'jquery-effects-core', 'jquery-ui-draggable', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-sortable' ), 1.1, true );
 				wp_enqueue_style( 'ht-gallery-manager-style', plugins_url( 'css/ht-gallery-manager-style.css', __FILE__ ));
-				wp_localize_script( 'ht-gallery-manager-scripts', 'framework', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+				wp_localize_script( 'ht-gallery-manager-scripts', 'framework', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ), 'ajaxnonce' => wp_create_nonce("ht-ajax-nonce") ) );
 				$this->uploader_localize();
 			} else if( $screen->post_type == 'ht_gallery_post' && $screen->base == 'edit' ) {
 				wp_enqueue_script( 'ht-gallery-sorter-scripts', plugins_url( 'js/ht-gallery-sorter-scripts.js', __FILE__ ), array( 'jquery' , 'jquery-effects-core', 'jquery-ui-draggable', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-sortable' ), 1.0, true );
-				wp_localize_script( 'ht-gallery-sorter-scripts', 'framework', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
+				wp_localize_script( 'ht-gallery-sorter-scripts', 'framework', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ), 'ajaxnonce' => wp_create_nonce("ht-ajax-nonce") ) );
 				wp_enqueue_style( 'ht-gallery-sorter-style', plugins_url( 'css/ht-gallery-sorter-style.css', __FILE__ ));
 
 			}
@@ -633,6 +691,11 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 		}
 
+		/**
+		* Modify the loop query on the backend to display all the Hero Galleries on on page.
+		*
+		* @param $query The WordPress query
+		*/
 		function show_all_gallery_posts($query) {
 			
 		    if(function_exists('get_current_screen'))
@@ -651,6 +714,11 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 		}
 
+		/**
+		* Add the additional columns to the custom post type listing
+		*
+		* @param $columns The initial columns passed from the filter
+		*/
 		function ht_gallery_columns($columns){
 			$preview_columns = array(
 				'prev' => __('Preview', 'ht-gallery-manager')
@@ -662,6 +730,12 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 	    	return array_merge($columns, $preview_columns, $order_columns);
 		}
 
+		/**
+		* Display custom values for the column in custom post type listing
+		*
+		* @param $column Column name
+		* @param $post_id The post id (though this appears not to get passed correct, use global $post instead)
+		*/
 		function ht_gallery_custom_column( $column, $post_id ) {
 			global $post;
 		    switch ( $column ) {
@@ -675,8 +749,10 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		    }
 		}
 
-		function save_ht_gallery_order_ajax(){
-
+		/**
+		* AJAX function to save the menu order of the galleries in the custom post type listing
+		*/
+		function save_ht_gallery_menu_order_ajax(){
 			$ht_order_array =  $_POST['gallery_order'];
 
 			foreach ($ht_order_array as $key => $current_gallery) {
@@ -688,10 +764,31 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 						'menu_order' => $menu_order
 					);
 				wp_update_post( $post_update );
-
 			}
 
 			echo json_encode('updated gallery order sucessfully');
+
+			die(); // this is required to return a proper result
+		}
+
+		/**
+		* AJAX function to save gallery images 
+		*/
+		function save_ht_gallery_images_ajax(){
+
+			///start here
+			$images = sanitize_text_field( $_POST['images'] );
+			$starred = sanitize_text_field( $_POST['starred'] );
+			$post_id = intval( $_POST['post_id'] );
+
+			//security check
+			check_ajax_referer( 'ht-ajax-nonce', 'security' );
+
+			if($post_id>0){
+				update_post_meta( $post_id, $this->meta_value_key, $images);
+				update_post_meta( $post_id, $this->starred_meta_value_key, $starred);
+				echo json_encode('updated gallery images sucessfully');
+			}
 
 			die(); // this is required to return a proper result
 		}
@@ -719,19 +816,127 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			return $starred_image;
 		}
 
+		/**
+		* Get the starred image - uses wp_get_attachment_image
+		*
+		* @param $gallery_post_id The Post ID of the gallery
+		* @param $size The size required, either a string or Array(x, y) (Default 'thumbnail') 
+		* @return an HTML img element or empty string on failure.
+		*/
 		public function get_starred_image_thumbnail($gallery_post_id, $size = 'thumbnail'){
 			return wp_get_attachment_image( HT_Gallery_Manager::get_starred_image( $gallery_post_id ) , $size  );
 		}
 
+		/**
+		* Get the starred image src - uses wp_get_attachment_image_src
+		*
+		* @param $gallery_post_id The Post ID of the gallery
+		* @param $size The size required, either a string or Array(x, y) (Default 'thumbnail') 
+		* @return array [0] => url, [1] => width, [2] => height, [3] => boolean: true if $url is a resized image, false if it is the original.
+		*/
 		public function get_starred_image_src($gallery_post_id, $size = 'thumbnail'){
 			return wp_get_attachment_image_src( HT_Gallery_Manager::get_starred_image( $gallery_post_id ) , $size  );
 		}
 
+		/**
+		* Get the number of images in a Hero Gallery
+		*
+		* @param $gallery_post_id The Post ID of the gallery
+		* @return int Count of items in gallery
+		*/
 		public function get_hero_gallery_image_count($gallery_post_id){
 			$gallery_ids = get_post_meta( $gallery_post_id, $this->meta_value_key, true );
 			$gallery_array = $gallery_ids != '' ? explode( ',', $gallery_ids ) : array();
 			return count( $gallery_array );
 		}
+
+
+		/**
+		* Adds the HT Gallery Menu Metabox
+		*/
+		function ht_gallery_menu_metabox() {
+	    	add_meta_box( 'add_ht_gallery_menu_item', __('Hero Galleries Archive', 'ht-gallery-manager'), array( $this, 'ht_gallery_menu_metabox_content' ), 'nav-menus', 'side', 'default' );
+	  	}
+		
+		/**
+		* Adds the HT Gallery Menu Metabox Content
+		*/
+		function ht_gallery_menu_metabox_content() {
+	    	
+	    	// Create menu items and store IDs in array
+			$item_ids = array();
+			$post_type = 'ht_gallery_post';
+			$post_type_obj = get_post_type_object( $post_type );
+
+			if( ! $post_type_obj )
+				continue;
+
+			//add menu data
+			$menu_item_data = array(
+				 'menu-item-title'  => esc_attr( $post_type_obj->labels->name ),
+				 'menu-item-type'   => $post_type,
+				 'menu-item-object' => esc_attr( $post_type ),
+				 'menu-item-url'    => get_post_type_archive_link( $post_type )
+			);
+
+			// add the menu item
+			$item_ids[] = wp_update_nav_menu_item( 0, 0, $menu_item_data );
+
+			// Die on error
+			is_wp_error( $item_ids ) AND die( '-1' );
+
+			// Set up the menu items
+			foreach ( (array) $item_ids as $menu_item_id ) {
+				$menu_obj = get_post( $menu_item_id );
+				if ( ! empty( $menu_obj->ID ) ) {
+					$menu_obj->classes = array();
+					$menu_obj->label = __('Hero Galleries Archive', 'ht-gallery-manager');
+			        $menu_obj->object_id = $menu_obj->ID;
+			        $menu_obj->object = 'ht-gallery-archive';						
+					$menu_items[] = $menu_obj;
+
+				}
+			}
+
+		    $menus = array_map('wp_setup_nav_menu_item', $menu_items);
+			$walker = new Walker_Nav_Menu_Checklist( array() );
+	
+			echo '<div id="ht-gallery-post-archive" class="posttypediv">';
+			echo '<div id="tabs-panel-ht-gallery-post-archive" class="tabs-panel tabs-panel-active">';
+			echo '<ul id="ctp-archive-checklist" class="categorychecklist form-no-clear">';
+			echo walk_nav_menu_tree( $menus, 0, (object) array( 'walker' => $walker) );
+			echo '</ul>';
+			echo '</div><!-- /.tabs-panel -->';
+			echo '</div>';
+			echo '<p class="button-controls">';
+			echo '<span class="add-to-menu">';
+			echo '<input type="submit" class="button-secondary submit-add-to-menu" value="' . __('Add to Menu', 'ht-gallery-manager') . '" name="add-ht-gallery-post-archive-menu-item" id="submit-ht-gallery-post-archive" />';
+			echo '</span>';
+			echo '</p>';
+			
+		}
+		
+		/**
+		* Menu filter for HT Gallery Posts Archive
+		*
+		* @param $items The Items
+		* @param $menu Menu
+		* @param $args Additional params
+		*/
+		function ht_gallery_archive_menu_filter( $items, $menu, $args ) {
+	    	foreach( $items as $item ) {
+	      		if( $item->object != 'ht-gallery-archive' ) continue;
+	      		$item->url = get_post_type_archive_link( $item->type );
+	      
+	      		if( get_query_var( 'post_type' ) == $item->type ) {
+	       			$item->classes[] = 'current-menu-item';
+	        		$item->current = true;
+	      		}
+	    	}
+	    	
+	    	return $items;
+		}
+		
 
 		
 

@@ -3,7 +3,7 @@ Contributors: herothemes
 Tags: images, gallery, manager, photos, photography, photo
 Requires at least: 3.5
 Tested up to: 3.7.1
-Stable tag: 1.4
+Stable tag: 1.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,18 @@ A. Simply hit the refresh button and the images will be re-loaded.
 
 
 == Changelog ==
+
+= 1.7 =
+
+New sprites and tweaked UI. Can now add Hero Gallery Archives as top-level custom menu item.
+
+= 1.6 =
+
+Autosave of image order and meta, editing image opens in new tab
+
+= 1.5 =
+
+Custom slugs
 
 = 1.4 =
 

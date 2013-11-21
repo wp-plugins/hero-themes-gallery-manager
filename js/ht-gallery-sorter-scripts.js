@@ -25,7 +25,7 @@ jQuery(document).ready(function($){
 
 
     var sortFinish = function(e, ui){
-        console.log('soting stopped');
+        console.log('sorting stopped');
         assignNewMenuOrders();
         saveMenuOrder();
     };
