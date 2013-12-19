@@ -1,6 +1,7 @@
 var HTAjaxFramework = {
     // dummy url - replaced by WordPresses localize scripts function
     ajaxurl: "http://example.com/wordpress/wp-admin/admin-ajax.php",
+    ajaxnonce: "abcdef",
 };
 
 var pconfig=false;
@@ -234,7 +235,7 @@ jQuery(document).ready(function($){
         liElementToInsert += '</div><!-- /gallery-item-starred-tools -->';
 
         liElementToInsert += '<div id="edit-gallery-item-' + element['id'] + '" class="gallery-item-edit-tools">';
-        liElementToInsert += '<a href="' + element['editLink'] + '" class="edit-ht-gallery-item" data-edit-id="' + element['id'] + '"> </a>';
+        liElementToInsert += '<a href="' + element['editLink'] + '" class="edit-ht-gallery-item" data-edit-id="' + element['id'] + '" target="_blank"> </a>';
         liElementToInsert += '<a href="#" class="delete-ht-gallery-item" data-delete-id="' + element['id'] + '"> </a>';
         liElementToInsert += '</div><!-- /gallery-item-edit-tools -->';
         var thumbnail = null;
@@ -327,6 +328,7 @@ jQuery(document).ready(function($){
         },
         stop: function( event, ui ) {
             syncListWithIDs();
+            saveImageOrder();
         },
         start: function( event, ui ) {
             //can add text placeholder here if required
@@ -343,6 +345,7 @@ jQuery(document).ready(function($){
         $('#gallery-item-' + id).hide( 'slow', function(){ 
             $('#gallery-item-' + id).remove(); 
             syncListWithIDs(); 
+            saveImageOrder();
             updateGalleryCount(); 
         } );
     }
@@ -361,6 +364,30 @@ jQuery(document).ready(function($){
            separator = ',';
         });
         $('#ht_gallery_values').val(newListString);
+    }
+
+    /**
+    * Saves the list order
+    */
+    function saveImageOrder(){
+        var listOrder = $('#ht_gallery_values').val();
+        var starredImage = $('#ht_gallery_starred_image').val();
+        //shout save, even if empty list
+        saveImages(listOrder, starredImage);
+    }
+
+    function saveImages(imagesList, starredImage){
+        $.post( url = framework.ajaxurl + "?saveimages",
+                data = {
+                    'action': 'save_ht_gallery_images',
+                    'images': imagesList,
+                    'starred': starredImage,
+                    'post_id' : $( "input#post_ID" ).val() || 0,
+                    'security': framework.ajaxnonce,
+                },
+                success = function(data, textStatus, jqXHR){
+                }
+            );
     }
 
     /**
@@ -479,7 +506,9 @@ jQuery(document).ready(function($){
                 action      : htGalleryUploaderInit.multipart_params.action,
                 imgid       : uploaderId,
                 galleryName : $( '#' + uploaderId + '-gallery-name' ).val(),
-                parentId    : $( "input#post_ID" ).val() || 0
+                post_id    : $( "input#post_ID" ).val() || 0,
+                short       : false,
+                long        : true
             }
         };
 
@@ -605,6 +634,7 @@ jQuery(document).ready(function($){
         $('li.gallery-item.starred').removeClass('starred');
         //add starred class to li item
         $('li#gallery-item-'+imageID).addClass('starred');
+        saveImageOrder();
     }
 
 
