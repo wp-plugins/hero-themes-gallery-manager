@@ -4,17 +4,21 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.7
+*	Version: 1.11
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
 
 
 DEFINE( 'HERO_THEMES_REF_LINK','http://www.herothemes.com/?ref=ht_gallery' );
+DEFINE( 'HT_GALLERY_META_KEY_VALUE', '_ht_gallery_images' );
+DEFINE( 'HT_GALLERY_STARRED_META_KEY_VALUE', '_ht_gallery_starred_image' );
+DEFINE( 'HT_GALLERY_VIEW_META_KEY_VALUE', '_ht_gallery_view' );
 
 
 if( !class_exists( 'HT_Gallery_Manager' ) ){
 	class HT_Gallery_Manager {
+		
 		//constructor
 		function __construct(){
 			add_action( 'init', array( $this,  'register_ht_gallery_post_cpt' ) );
@@ -42,9 +46,11 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			register_activation_hook(__FILE__, array( $this, 'ht_gallery_flush_rules' ) );
 
 			//set the meta key value
-			$this->meta_value_key = '_ht_gallery_images';
-			$this->starred_meta_value_key = '_ht_gallery_starred_image';
-			$this->view_value_key = '_ht_gallery_view';
+			$this->meta_value_key = HT_GALLERY_META_KEY_VALUE;
+			$this->starred_meta_value_key = HT_GALLERY_STARRED_META_KEY_VALUE;
+			$this->view_value_key = HT_GALLERY_VIEW_META_KEY_VALUE;
+
+			
 			
 
 			include_once('php/ht-gallery-manager-settings.php');
@@ -137,7 +143,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				'has_archive'        => true,
 				'hierarchical'       => false,
 				'menu_position'      => null,
-				'supports'           => array( 'title', 'editor', 'page-attributes' )
+				'supports'           => array( 'title', 'editor', 'page-attributes', 'comments' )
 			);
 
 		  register_post_type( 'ht_gallery_post', $args );
@@ -500,11 +506,15 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			extract(shortcode_atts(array(  
 	                'name' => '',
 	                'id' => '',
+	                'columns' => '',
 	            ), $atts));
 
+			$columns_string = !empty($columns) ? 'columns="' . $columns . '"' : '';
 
 			if( empty($name) && empty($id) ){
 				return;
+			} if( !empty($columns) && !is_numeric($columns) ){
+				return  __( 'Columns value is not a number'.$columns, 'hero-gallery-manager' );
 			} else if( !empty($name) && empty($id)  ){
 				//id takes precendant over name
 				//get gallery post 
@@ -513,7 +523,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 					//get the meta
 					$gallery_ids = get_post_meta( $gallery->ID, $this->meta_value_key, true );
 					if( $gallery_ids && $gallery_ids!='' ){
-						return do_shortcode('[gallery ids="' . $gallery_ids . '"]');
+						return do_shortcode('[gallery ids="' . $gallery_ids . '" '.$columns_string.']');
 					} else {
 						return sprintf( __( 'The Hero Gallery with the name %s is empty.', 'hero-gallery-manager' ), $name );
 					}
@@ -529,7 +539,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 					//get the meta
 					$gallery_ids = get_post_meta( $gallery->ID, $this->meta_value_key, true );
 					if( $gallery_ids && $gallery_ids!='' ){
-						return do_shortcode('[gallery ids="' . $gallery_ids . '"]');
+						return do_shortcode('[gallery ids="' . $gallery_ids . '" '.$columns_string.']');
 					} else {
 						return sprintf( __( 'The Hero Gallery with the id %s is empty.', 'hero-gallery-manager' ), $id );
 					}
@@ -647,6 +657,17 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			?>
 					</select>
 					<br/><br/>
+					<select name="ht-gallery-columns-select" id="ht-gallery-columns-select">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3" selected="selected">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">6</option>
+						<option value="7">7</option>
+					</select>
+					<span><?php _e('Columns', 'ht-gallery-manager'); ?></span>
+					<br/><br/>
 			<?php
 				foreach ($ht_galleries as $gallery) {
 						$gallery_id = $gallery['id'];
@@ -654,7 +675,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 						//echo '<p>' . __('Preview' , 'ht-gallery-manager' ) . '</p>';
 						$img = HT_Gallery_Manager::get_starred_image_src( $gallery_id );
 						if( $img ){
-							echo '<img src="' . $img[0].'" width="' . $img[1].'" height="' . $img[1].'" />';
+							echo '<img src="' . $img[0] . '" width="' . $img[1] . '" height="' . $img[1] . '" />';
 						} else {
 							
 						}
@@ -663,8 +684,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				}
 
 			?>		
-					<a href="#" id="insert-ht-gallery" class="button button-primary button-large" onClick="window.send_to_editor( '[ht_gallery id=&quot;' + jQuery('#ht-gallery-select').val() + '&quot; name=&quot;' + jQuery('#ht-gallery-select').children('option').filter(':selected').text() + '&quot;]' ); jQuery('#select-hero-gallery-dialog').fadeOut();">Add</a>
-					<a href="#" id="cancel-insert-ht-gallery" class="button  button-large" onClick="window.send_to_editor( '' ); jQuery('#select-hero-gallery-dialog').fadeOut();">Cancel</a>
+					<a href="#" id="insert-ht-gallery" class="button button-primary button-large" onClick="htSelectHTGallery(); return false;">Add</a>
+					<a href="#" id="cancel-insert-ht-gallery" class="button  button-large" onClick="cancelSelectHTGallery(); return false;">Cancel</a>
 					 
 				</div>
 			<?php
@@ -798,16 +819,16 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		*
 		* @param $post_id The post id of the Hero Gallery
 		*/
-		public function get_starred_image($gallery_post_id){
+		public static function get_starred_image($gallery_post_id){
 			$starred_image = '';
 
 			//get the post meta for starred image
-			$starred_image = get_post_meta( $gallery_post_id, $this->starred_meta_value_key, true );
+			$starred_image = get_post_meta( $gallery_post_id, HT_GALLERY_STARRED_META_KEY_VALUE, true );
 
 			//if no starred image set use the first image in the gallery
 			if( $starred_image == ''){
-				$gallery_ids = get_post_meta( $gallery_post_id, $this->meta_value_key, true );
-				$gallery_array = $gallery_ids != '' ? explode( ',', $gallery_ids ) : array();
+				$gallery_ids = get_post_meta( $gallery_post_id, HT_GALLERY_META_KEY_VALUE, true );
+				$gallery_array = ( !is_a('WP_Error', $gallery_ids) || $gallery_ids != '' ) ? explode( ',', $gallery_ids ) : array();
 				if( count( $gallery_array ) > 0 ){
 					$starred_image = $gallery_array[0];
 				}
@@ -823,7 +844,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* @param $size The size required, either a string or Array(x, y) (Default 'thumbnail') 
 		* @return an HTML img element or empty string on failure.
 		*/
-		public function get_starred_image_thumbnail($gallery_post_id, $size = 'thumbnail'){
+		public static function get_starred_image_thumbnail($gallery_post_id, $size = 'thumbnail'){
 			return wp_get_attachment_image( HT_Gallery_Manager::get_starred_image( $gallery_post_id ) , $size  );
 		}
 
@@ -834,7 +855,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* @param $size The size required, either a string or Array(x, y) (Default 'thumbnail') 
 		* @return array [0] => url, [1] => width, [2] => height, [3] => boolean: true if $url is a resized image, false if it is the original.
 		*/
-		public function get_starred_image_src($gallery_post_id, $size = 'thumbnail'){
+		public static function get_starred_image_src($gallery_post_id, $size = 'thumbnail'){
 			return wp_get_attachment_image_src( HT_Gallery_Manager::get_starred_image( $gallery_post_id ) , $size  );
 		}
 
@@ -844,11 +865,24 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* @param $gallery_post_id The Post ID of the gallery
 		* @return int Count of items in gallery
 		*/
-		public function get_hero_gallery_image_count($gallery_post_id){
-			$gallery_ids = get_post_meta( $gallery_post_id, $this->meta_value_key, true );
+		public static function get_hero_gallery_image_count($gallery_post_id){
+			$gallery_ids = get_post_meta( $gallery_post_id, HT_GALLERY_META_KEY_VALUE, true );
 			$gallery_array = $gallery_ids != '' ? explode( ',', $gallery_ids ) : array();
 			return count( $gallery_array );
 		}
+
+		/**
+		* Get the number of images in a Hero Gallery
+		*
+		* @param $gallery_post_id The Post ID of the gallery
+		* @return an array of images
+		*/
+		public static function get_hero_gallery_images($gallery_post_id){
+			$ht_gallery = get_post_meta( get_the_ID(), HT_GALLERY_META_KEY_VALUE, true );
+			$ht_gallery = is_a($ht_gallery, 'WP_Error') ? array() : explode(",", $ht_gallery);
+		}
+
+
 
 
 		/**
@@ -936,7 +970,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 	    	
 	    	return $items;
 		}
-		
+
+
 
 		
 

@@ -2,8 +2,8 @@
 Contributors: herothemes
 Tags: images, gallery, manager, photos, photography, photo
 Requires at least: 3.5
-Tested up to: 3.7.1
-Stable tag: 1.7
+Tested up to: 3.8
+Stable tag: 1.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -50,6 +50,22 @@ A. Simply hit the refresh button and the images will be re-loaded.
 
 
 == Changelog ==
+
+= 1.10 = 
+
+Added static methods to obtain galleries and starred images
+
+= 1.10 = 
+
+Added columns to shortcode
+
+= 1.9 =
+
+Move password protection to Hero Themes Gallery Proofing plugin
+
+= 1.8 =
+
+Password protect CPT meta.
 
 = 1.7 =
 
