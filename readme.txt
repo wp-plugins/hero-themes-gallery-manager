@@ -1,4 +1,4 @@
-=== Hero Themes Gallery Manager ===
+=== Heroic Gallery Manager ===
 Contributors: herothemes
 Tags: images, gallery, manager, photos, photography, photo
 Requires at least: 3.5
@@ -7,15 +7,15 @@ Stable tag: 1.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Hero Themes Gallery Manager is an enhanced drag and drop gallery manager for WordPress
+Heroic Gallery Manager is an enhanced drag and drop gallery manager for WordPress
 
 == Description ==
 
-The **Ultimate** gallery manager that combines the best features of the WordPress media manager with a simplified and flexible gallery management tool. Create and manage your galleries with Hero Themes Gallery Manager. Drag and drop re-ordering, uploads, editing  and simple, powerful gallery views.
+The **Ultimate** gallery manager that combines the best features of the WordPress media manager with a simplified and flexible gallery management tool. Create and manage your galleries with Heroic Gallery Manager. Drag and drop re-ordering, uploads, editing  and simple, powerful gallery views.
 
 **Video Demonstration**
 
-A short video demonstrating the improved workflow benefits using Hero Gallery Manager:
+A short video demonstrating the improved workflow benefits using Heroic Gallery Manager:
 
 [youtube http://www.youtube.com/watch?v=0kIxPJLa5vk]
 
@@ -24,10 +24,10 @@ A short video demonstrating the improved workflow benefits using Hero Gallery Ma
 
 It's easy to get started
 
-1. Upload `ht-gallery-manager` to the `/wp-content/plugins/` directory or goto Plugins>Add New and search for Hero Themes Gallery Manager.
+1. Upload `ht-gallery-manager` to the `/wp-content/plugins/` directory or goto Plugins>Add New and search for Heroic Gallery Manager.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Under the new Hero Galleries menu option select New Hero Gallery.
-4. Be sure to click publish/update to save your Hero Gallery, then copy the shortcode into your post or page where you want the Hero Gallery to appear or select `Add Hero Gallery` from the target post or page.
+3. Under the new Heroic Galleries menu option select New Heroic Gallery.
+4. Be sure to click publish/update to save your Heroic Gallery, then copy the shortcode into your post or page where you want the Heroic Gallery to appear or select `Add Heroic Gallery` from the target post or page.
 5. You can star an image, which works in a similar way to featured images. These will appear as a cover image when using a supporting theme.
 
 == Frequently Asked Questions ==
@@ -36,7 +36,7 @@ It's easy to get started
 
 A. Be sure to hit publish or update on the right when you've finished editing.
 
-= Q. My images don't appear when adding or editing a Hero Gallery? =
+= Q. My images don't appear when adding or editing a Heroic Gallery? =
 
 A. Simply hit the refresh button and the images will be re-loaded.
 
@@ -50,6 +50,10 @@ A. Simply hit the refresh button and the images will be re-loaded.
 
 
 == Changelog ==
+
+= 1.11 = 
+
+Renamed to Heroic Gallery Manager from Hero Themes Gallery Manager
 
 = 1.10 = 
 

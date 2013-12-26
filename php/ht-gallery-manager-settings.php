@@ -24,7 +24,7 @@ class HT_Gallery_Manager_Settings_Page {
 
  
     /**
-    * Add Hero Gallery Menu Icons
+    * Add Heroic Gallery Menu Icons
     */
     public function hero_gallery_menu_icons() {
         ?>
@@ -46,7 +46,7 @@ class HT_Gallery_Manager_Settings_Page {
     public function add_plugin_page() {
         // This page will be under "Settings"
         add_submenu_page('edit.php?post_type=ht_gallery_post', 
-            __( 'Hero Gallery Settings' , 'ht-gallery-manager' ), 
+            __( 'Heroic Gallery Settings' , 'ht-gallery-manager' ), 
             __( 'Settings' , 'ht-gallery-manager' ),
             'edit_posts', 'ht_gallery_manager_settings_page', 
             array( $this, 'create_admin_page' )

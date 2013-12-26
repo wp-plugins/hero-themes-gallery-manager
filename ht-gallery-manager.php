@@ -1,6 +1,6 @@
 <?php
 /*
-*	Plugin Name: Hero Themes Gallery Manager
+*	Plugin Name: Heroic Gallery Manager
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
@@ -113,8 +113,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* Registers the ht_gallery_post custom post type
 		*/
 		function register_ht_gallery_post_cpt() {
-			$singular_item = __('Hero Gallery', 'ht-gallery-manager');
-			$plural_item = __('Hero Galleries', 'ht-gallery-manager');
+			$singular_item = __('Heroic Gallery', 'ht-gallery-manager');
+			$plural_item = __('Heroic Galleries', 'ht-gallery-manager');
 		  	$labels = array(
 			    'name'               =>  $singular_item,
 			    'singular_name'      => 'Gallery',
@@ -204,7 +204,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 			add_meta_box(
 				'hero_gallery_meta_shortcode',
-				__( 'Hero Gallery Shortcode Information', 'ht-gallery-manager' ),
+				__( 'Heroic Gallery Shortcode Information', 'ht-gallery-manager' ),
 				array( $this, 'render_hero_gallery_meta_box_shortcode_info' ),
 				'ht_gallery_post',
 				'normal',
@@ -212,7 +212,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				);
 			add_meta_box(
 				'hero_gallery_meta_main',
-				__( 'Hero Gallery Images', 'ht-gallery-manager' ),
+				__( 'Heroic Gallery Images', 'ht-gallery-manager' ),
 				array( $this, 'render_hero_gallery_meta_box_content' ),
 				'ht_gallery_post',
 				'normal',
@@ -285,7 +285,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				remove_action( 'save_post', array( $this, 'save_hero_gallery' ) );
 				$post = array(
 							'ID' => $post_id,
-							'post_title' => "Hero Gallery " . $post_id
+							'post_title' => "Heroic Gallery " . $post_id
 					);
 				//update post
 				wp_update_post( $post );
@@ -316,12 +316,12 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		 * @param WP_Post $post The post object.
 		 */
 		public function render_hero_gallery_meta_box_shortcode_info( $post ) {
-			printf( __( 'To use this Hero Gallery enter the shortcode <b>[ht_gallery id="%s" name="%s"]</b> in your post or page or use the Insert Hero Gallery button.', 'ht-gallery-manager' ), $post->ID, $post->post_title );
+			printf( __( 'To use this Heroic Gallery enter the shortcode <b>[ht_gallery id="%s" name="%s"]</b> in your post or page or use the Insert Heroic Gallery button.', 'ht-gallery-manager' ), $post->ID, $post->post_title );
 		}
 
 
 		/**
-		 * Render Main Hero Gallery Meta Box content.
+		 * Render Main Heroic Gallery Meta Box content.
 		 *
 		 * @param WP_Post $post The post object.
 		 */
@@ -347,7 +347,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		 * @param WP_Post $post The post object.
 		 */
 		public function render_hero_gallery_side_meta_box_content( $post ) {
-			_e( 'Want even more from your Hero Gallery?', 'hero-gallery-manager' );
+			_e( 'Want even more from your Heroic Gallery?', 'hero-gallery-manager' );
 			echo '<br/><br/>';
 			_e( sprintf( 'Choose a %1$sHero Theme%2$s for even more power.', '<a href="'.HERO_THEMES_REF_LINK.'">', '</a>' ), 'hero-gallery-manager' );
 
@@ -360,7 +360,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 
 		/**
-		* Display the Hero Gallery metabox
+		* Display the Heroic Gallery metabox
 		*
 		* @param int $post_id The id of the current post
 		*/
@@ -495,7 +495,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 
 		/**
-		* Hero Gallery shortcode function
+		* Heroic Gallery shortcode function
 		*
 		* @param array $attrs The shortcode passed attribute
 		* @param array $content The shortcode passed content (this will always be ignored in this context)
@@ -525,11 +525,11 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 					if( $gallery_ids && $gallery_ids!='' ){
 						return do_shortcode('[gallery ids="' . $gallery_ids . '" '.$columns_string.']');
 					} else {
-						return sprintf( __( 'The Hero Gallery with the name %s is empty.', 'hero-gallery-manager' ), $name );
+						return sprintf( __( 'The Heroic Gallery with the name %s is empty.', 'hero-gallery-manager' ), $name );
 					}
 
 				} else {
-					return sprintf( __( 'There is no Hero Gallery with the name %s.', 'hero-gallery-manager' ), $name );
+					return sprintf( __( 'There is no Heroic Gallery with the name %s.', 'hero-gallery-manager' ), $name );
 				}
 			} else if( !empty($id) ){
 				//id takes precendant over name
@@ -541,14 +541,14 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 					if( $gallery_ids && $gallery_ids!='' ){
 						return do_shortcode('[gallery ids="' . $gallery_ids . '" '.$columns_string.']');
 					} else {
-						return sprintf( __( 'The Hero Gallery with the id %s is empty.', 'hero-gallery-manager' ), $id );
+						return sprintf( __( 'The Heroic Gallery with the id %s is empty.', 'hero-gallery-manager' ), $id );
 					}
 
 				} else {
-					return sprintf( __( 'There is no Hero Gallery with the id %s.', 'hero-gallery-manager' ), $id );
+					return sprintf( __( 'There is no Heroic Gallery with the id %s.', 'hero-gallery-manager' ), $id );
 				}
 			} else {
-				return __( 'Could not get Hero Gallery', 'hero-gallery-manager' );
+				return __( 'Could not get Heroic Gallery', 'hero-gallery-manager' );
 			}
 		}
 
@@ -621,27 +621,27 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		}
 
 		/**
-		* Add the Hero Gallery button to the post editor
+		* Add the Heroic Gallery button to the post editor
 		*/
 		function ht_add_form_button(){
 			$page = is_admin() ? get_current_screen() : null;
 
 			if( $page == null || ( isset($page) && $page->id!='ht_gallery_post'  ) ){
-				echo '<a href="#TB_inline?width=600&height=550&inlineId=select-hero-gallery-dialog" class="thickbox button" id="add_ht_gallery" title="' . __("Add Hero Gallery", 'hero-gallery-manager') . '"><span class="ht-gallery-media-icon "></span> ' . __("Add Hero Gallery", "hero-gallery-manager") . '</a>';
+				echo '<a href="#TB_inline?width=600&height=550&inlineId=select-hero-gallery-dialog" class="thickbox button" id="add_ht_gallery" title="' . __("Add Heroic Gallery", 'hero-gallery-manager') . '"><span class="ht-gallery-media-icon "></span> ' . __("Add Heroic Gallery", "hero-gallery-manager") . '</a>';
 				add_action( 'admin_footer', array ( $this, 'ht_select_hero_gallery_form' ) );
 			}		
 		}
 
 		/**
-		* Displays the Insert a Hero Gallery Selector
+		* Displays the Insert a Heroic Gallery Selector
 		*/
 		function ht_select_hero_gallery_form(){
 				$this->ht_select_hero_gallery_scripts_and_styles();
 
 			?>
 				<div id="select-hero-gallery-dialog" style="display:none">
-					<h3><?php _e('Insert a Hero Gallery', 'hero-gallery-manager'); ?></h3>
-					<p><?php _e('Add a Hero Gallery to the current post', 'hero-gallery-manager'); ?></p>
+					<h3><?php _e('Insert a Heroic Gallery', 'hero-gallery-manager'); ?></h3>
+					<p><?php _e('Add a Heroic Gallery to the current post', 'hero-gallery-manager'); ?></p>
 			<?php
 				$ht_galleries = apply_filters( 'get_ht_galleries', array() );
 			?>	
@@ -817,7 +817,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		/**
 		* Get the attachment id of the starred image (or first image from a set) for a given id
 		*
-		* @param $post_id The post id of the Hero Gallery
+		* @param $post_id The post id of the Heroic Gallery
 		*/
 		public static function get_starred_image($gallery_post_id){
 			$starred_image = '';
@@ -860,7 +860,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		}
 
 		/**
-		* Get the number of images in a Hero Gallery
+		* Get the number of images in a Heroic Gallery
 		*
 		* @param $gallery_post_id The Post ID of the gallery
 		* @return int Count of items in gallery
@@ -872,7 +872,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		}
 
 		/**
-		* Get the number of images in a Hero Gallery
+		* Get the number of images in a Heroic Gallery
 		*
 		* @param $gallery_post_id The Post ID of the gallery
 		* @return an array of images
