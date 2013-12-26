@@ -1,0 +1,17 @@
+#select-hero-gallery-dialog {
+
+}
+
+#insert-ht-gallery {
+	color: #fff !important;
+	margin-right: 5px;
+}
+
+.ht-gallery-select-preview {
+	display: none;
+}
+
+.ht-gallery-select-preview.show {
+	display: block;
+	margin-bottom: 5px;
+}
