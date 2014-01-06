@@ -3,7 +3,7 @@ Contributors: herothemes
 Tags: images, gallery, manager, photos, photography, photo
 Requires at least: 3.5
 Tested up to: 3.8
-Stable tag: 1.11
+Stable tag: 1.12
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -11,7 +11,14 @@ Heroic Gallery Manager is an enhanced drag and drop gallery manager for WordPres
 
 == Description ==
 
-The **Ultimate** gallery manager that combines the best features of the WordPress media manager with a simplified and flexible gallery management tool. Create and manage your galleries with Heroic Gallery Manager. Drag and drop re-ordering, uploads, editing  and simple, powerful gallery views.
+The **Ultimate** gallery manager that combines the best features of the WordPress media manager with a simplified and flexible gallery management tool. 
+
+Create and manage your galleries with Hero Themes Gallery Manager. Drag and drop re-ordering, uploads, editing and simple, powerful gallery views. This gallery manager has been designed specifically for the requirements of photography professionals and creatives. From one screen you can upload all your images, sort and rename images, adding captions and gallery description. This makes the process of getting your images online faster and simpler, with more control and flexibility than other gallery solutions.
+
+All of these features, combined with the simplicity of use, makes Hero Gallery Manager one of the best gallery creation and management tools. Better still you are in complete control as it can use it right from your existing WordPress powered site without the expense of 3rd party offerings.
+
+For more themes, plugins and news visit us at [HeroThemes.com](http://www.herothemes.com/?ref=ht_gallery "Hero Themes")
+
 
 **Video Demonstration**
 

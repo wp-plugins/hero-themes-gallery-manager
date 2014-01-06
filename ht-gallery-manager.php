@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.11
+*	Version: 1.12
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
