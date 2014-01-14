@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.12
+*	Version: 1.13
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -21,6 +21,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		
 		//constructor
 		function __construct(){
+			load_plugin_textdomain('ht-gallery-manager', false, basename( dirname( __FILE__ ) ) . '/languages' );
+			
 			add_action( 'init', array( $this,  'register_ht_gallery_post_cpt' ) );
 			add_action( 'init', array( $this,  'register_ht_gallery_category_taxonomy' ) );
 	
@@ -57,6 +59,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		}
 
 
+
+
 		public static function get_meta_key_value(){
 			return $this->meta_value_key;
 		}
@@ -80,18 +84,18 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		function register_ht_gallery_category_taxonomy()  {
 
 			$labels = array(
-				'name'                       => _x( 'Gallery Category', 'Taxonomy General Name', 'ht-gallery-manager' ),
-				'singular_name'              => _x( 'Gallery Category', 'Taxonomy Singular Name', 'ht-gallery-manager' ),
-				'menu_name'                  => __( 'Gallery Categories', 'ht-gallery-manager' ),
-				'all_items'                  => __( 'All Gallery Categories', 'ht-gallery-manager' ),
-				'parent_item'                => __( 'Parent Gallery Category', 'ht-gallery-manager' ),
-				'parent_item_colon'          => __( 'Parent Gallery Category:', 'ht-gallery-manager' ),
-				'new_item_name'              => __( 'New Gallery Category', 'ht-gallery-manager' ),
-				'add_new_item'               => __( 'Add New Gallery Category', 'ht-gallery-manager' ),
-				'edit_item'                  => __( 'Edit Gallery Category', 'ht-gallery-manager' ),
-				'update_item'                => __( 'Update Gallery Category', 'ht-gallery-manager' ),
-				'separate_items_with_commas' => __( 'Separate Gallery Categories with commas', 'ht-gallery-manager' ),
-				'search_items'               => __( 'Search Gallery Categories', 'ht-gallery-manager' ),
+				'name'                       => _x( 'Heroic Gallery Category', 'Taxonomy General Name', 'ht-gallery-manager' ),
+				'singular_name'              => _x( 'Heroic Gallery Category', 'Taxonomy Singular Name', 'ht-gallery-manager' ),
+				'menu_name'                  => __( 'Heroic Gallery Categories', 'ht-gallery-manager' ),
+				'all_items'                  => __( 'All Heroic Gallery Categories', 'ht-gallery-manager' ),
+				'parent_item'                => __( 'Parent Heroic Gallery Category', 'ht-gallery-manager' ),
+				'parent_item_colon'          => __( 'Parent Heroic Gallery Category:', 'ht-gallery-manager' ),
+				'new_item_name'              => __( 'New Heroic Gallery Category', 'ht-gallery-manager' ),
+				'add_new_item'               => __( 'Add New Heroic Gallery Category', 'ht-gallery-manager' ),
+				'edit_item'                  => __( 'Edit Heroic Gallery Category', 'ht-gallery-manager' ),
+				'update_item'                => __( 'Update Heroic Gallery Category', 'ht-gallery-manager' ),
+				'separate_items_with_commas' => __( 'Separate Heroic Gallery Categories with commas', 'ht-gallery-manager' ),
+				'search_items'               => __( 'Search Heroic Gallery Categories', 'ht-gallery-manager' ),
 				'add_or_remove_items'        => __( 'Add or remove categories', 'ht-gallery-manager' ),
 				'choose_from_most_used'      => __( 'Choose from the most used categories', 'ht-gallery-manager' ),
 			);
@@ -889,7 +893,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* Adds the HT Gallery Menu Metabox
 		*/
 		function ht_gallery_menu_metabox() {
-	    	add_meta_box( 'add_ht_gallery_menu_item', __('Hero Galleries Archive', 'ht-gallery-manager'), array( $this, 'ht_gallery_menu_metabox_content' ), 'nav-menus', 'side', 'default' );
+	    	add_meta_box( 'add_ht_gallery_menu_item', __('Heroic Galleries Archive', 'ht-gallery-manager'), array( $this, 'ht_gallery_menu_metabox_content' ), 'nav-menus', 'side', 'default' );
 	  	}
 		
 		/**
@@ -907,10 +911,10 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 			//add menu data
 			$menu_item_data = array(
-				 'menu-item-title'  => esc_attr( $post_type_obj->labels->name ),
-				 'menu-item-type'   => $post_type,
-				 'menu-item-object' => esc_attr( $post_type ),
-				 'menu-item-url'    => get_post_type_archive_link( $post_type )
+				'menu-item-title'  => esc_attr( $post_type_obj->labels->name ),
+-				 'menu-item-type'   => $post_type,
+-				 'menu-item-object' => esc_attr( $post_type ),
+-				 'menu-item-url'    => get_post_type_archive_link( $post_type )
 			);
 
 			// add the menu item
@@ -924,7 +928,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				$menu_obj = get_post( $menu_item_id );
 				if ( ! empty( $menu_obj->ID ) ) {
 					$menu_obj->classes = array();
-					$menu_obj->label = __('Hero Galleries Archive', 'ht-gallery-manager');
+					$menu_obj->label = __('Heroic Galleries Archive', 'ht-gallery-manager');
 			        $menu_obj->object_id = $menu_obj->ID;
 			        $menu_obj->object = 'ht-gallery-archive';						
 					$menu_items[] = $menu_obj;
