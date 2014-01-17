@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.13
+*	Version: 1.14
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -911,10 +911,10 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 			//add menu data
 			$menu_item_data = array(
-				'menu-item-title'  => esc_attr( $post_type_obj->labels->name ),
--				 'menu-item-type'   => $post_type,
--				 'menu-item-object' => esc_attr( $post_type ),
--				 'menu-item-url'    => get_post_type_archive_link( $post_type )
+				 'menu-item-title'  => esc_attr( $post_type_obj->labels->name ),
+				 'menu-item-type'   => $post_type,
+				 'menu-item-object' => esc_attr( $post_type ),
+				 'menu-item-url'    => get_post_type_archive_link( $post_type )
 			);
 
 			// add the menu item
@@ -953,6 +953,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			echo '</p>';
 			
 		}
+
+		 
 		
 		/**
 		* Menu filter for HT Gallery Posts Archive
