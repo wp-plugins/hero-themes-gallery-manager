@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.14
+*	Version: 1.15
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -32,9 +32,9 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
             add_action( 'media_buttons', array( $this, 'ht_add_form_button'), 20 );
             add_action( 'wp_ajax_save_ht_gallery_order', array( $this, 'save_ht_gallery_menu_order_ajax' ) );
             add_action( 'wp_ajax_save_ht_gallery_images', array( $this, 'save_ht_gallery_images_ajax' ) );
+            add_action( 'pre_get_posts', array( $this, 'show_all_gallery_posts' ) );
             
 			add_filter( 'media_view_settings', array($this, 'ht_gallery_media_view_settings'), 10, 2 );
-			add_action( 'pre_get_posts', array( $this, 'show_all_gallery_posts' ) );
 			add_shortcode( 'ht_gallery', array( $this , 'ht_gallery_shortcode' ) );
 			add_filter( 'manage_ht_gallery_post_posts_columns', array( $this, 'ht_gallery_columns'), 10, 1 );
 			add_filter( 'manage_ht_gallery_post_posts_custom_column', array( $this, 'ht_gallery_custom_column'), 10, 2 );
@@ -717,15 +717,14 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		}
 
 		/**
-		* Modify the loop query on the backend to display all the Hero Galleries on on page.
+		* Modify the loop query on the backend to display all the Hero Galleries on one page.
+		* On the front-end exclude hidden posts from the category view
 		*
 		* @param $query The WordPress query
 		*/
 		function show_all_gallery_posts($query) {
-			
 		    if(function_exists('get_current_screen'))
 		    	$screen = get_current_screen();
-
 		    
 			if( is_admin() && $screen && $screen->post_type == 'ht_gallery_post' && $screen->base == 'edit' ) {
 		        //-1 doesn't work here, need to use large int
@@ -734,6 +733,18 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		        $query->set('order', 'ASC');
 
 		        return $query;
+		    } else if( ( !is_single() && array_key_exists('post_type', $query->query_vars) && $query->query_vars['post_type'] == 'ht_gallery_post' ) ){
+		    	//if is not single and post type = 'ht_gallery_post' CPT archive
+		    	//exclude hidden posts
+		    	$query->set( 'post_status', array( 'publish' ) );
+		    } else if( array_key_exists('taxonomy', $query->query_vars) && $query->query_vars['taxonomy'] == 'ht_gallery_category' ) {
+		    	//exclude from the taxonomy in related items
+		    	//exclude hidden posts
+		    	$query->set( 'post_status', array( 'publish' ) );
+		    } else if( is_tax('ht_gallery_category')  ) {
+		    	//exlude from the taxonomy archive
+		    	//exclude hidden posts
+		    	$query->set( 'post_status', array( 'publish' ) );
 		    }
 
 
