@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.15
+*	Version: 1.16
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -511,9 +511,11 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 	                'name' => '',
 	                'id' => '',
 	                'columns' => '',
+	                'link' => '',
 	            ), $atts));
 
 			$columns_string = !empty($columns) ? 'columns="' . $columns . '"' : '';
+			$link_string = !empty($link) ? 'link="' . $link. '"' : 'link="file"';
 
 			if( empty($name) && empty($id) ){
 				return;
@@ -527,7 +529,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 					//get the meta
 					$gallery_ids = get_post_meta( $gallery->ID, $this->meta_value_key, true );
 					if( $gallery_ids && $gallery_ids!='' ){
-						return do_shortcode('[gallery ids="' . $gallery_ids . '" '.$columns_string.']');
+						
+						return do_shortcode('[gallery ids="' . $gallery_ids . '" '.$columns_string.' '.$link_string.']');
 					} else {
 						return sprintf( __( 'The Heroic Gallery with the name %s is empty.', 'hero-gallery-manager' ), $name );
 					}
@@ -543,7 +546,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 					//get the meta
 					$gallery_ids = get_post_meta( $gallery->ID, $this->meta_value_key, true );
 					if( $gallery_ids && $gallery_ids!='' ){
-						return do_shortcode('[gallery ids="' . $gallery_ids . '" '.$columns_string.']');
+						return do_shortcode('[gallery ids="' . $gallery_ids . '" '.$columns_string.' '.$link_string.']');
 					} else {
 						return sprintf( __( 'The Heroic Gallery with the id %s is empty.', 'hero-gallery-manager' ), $id );
 					}
