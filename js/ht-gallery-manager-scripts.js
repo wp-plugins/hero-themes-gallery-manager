@@ -10,6 +10,12 @@ jQuery(document).ready(function($){
     
     // prepare the variables that holds the custom media management tool and current selection.
     var heroGalleryManagementTool, heroGallerySelection, lastReplacedID;
+
+    //store an array of videos
+    var videos = [];
+
+    //keep a rercord of changing url
+    var changingURL = false;
     
     // if the frame already exists, re-open it.
     if (heroGalleryManagementTool) {
@@ -80,6 +86,8 @@ jQuery(document).ready(function($){
     */
     function loadIDsIntoSelection(ids){
         var selection = heroGalleryManagementTool.state().get('selection');
+        //get videos
+        getVideoURLsForIDs(ids);
         //reset
         selection.reset();
         ids.forEach(function(id) {
@@ -123,12 +131,15 @@ jQuery(document).ready(function($){
     * Get the current selection as an array of IDs
     */
     function getHeroGallerySelectionAsIDs() {
+        var currentIDs = $('#ht_gallery_values').val().split(',');
         var idList = [];
         var currentSelection = heroGallerySelection ? heroGallerySelection : [];
         currentSelection.forEach(function(element) {
               idList.push(element['id']);
             });
-        return idList;
+        var concatIDs = currentIDs.concat(idList);
+        //return concated IDs
+        return concatIDs;
     }
     
 
@@ -256,21 +267,28 @@ jQuery(document).ready(function($){
       
             //todo ajaxify form ;) and i18n
             liElementToInsert += '<label class="setting" data-setting="title">';
-            liElementToInsert += '<span>Title</span>';
+            liElementToInsert += '<span>' + framework.title + '</span>';
             liElementToInsert += '<input type="text" class="data-change title" id="edit-title-' + element['id'] + '" data-change="title" value="'+element['title']+'">';
             liElementToInsert += '</label>';
             liElementToInsert += '<label class="setting" data-setting="caption">';
-            liElementToInsert += '<span>Caption</span>';
+            liElementToInsert += '<span>' + framework.caption + '</span>';
             liElementToInsert += '<input type="text" class="data-change caption" id="edit-caption-' + element['id'] + '" data-change="caption" value="'+element['caption']+'">';
             liElementToInsert += '</label>';
             liElementToInsert += '<label class="setting" data-setting="alt">';
-            liElementToInsert += '<span>Alternative Text</span>';
+            liElementToInsert += '<span>' + framework.alt + '</span>';
             liElementToInsert += '<input type="text" class="data-change alt" id="edit-alt-' + element['id'] + '" data-change="alt" value="'+element['alt']+'">';
             liElementToInsert += '</label>';
             liElementToInsert += '<label class="setting" data-setting="description">';
-            liElementToInsert += '<span>Description</span>';
+            liElementToInsert += '<span>' + framework.description + '</span>';
             liElementToInsert += '<input type="text" class="data-change description" id="edit-description-' + element['id'] + '" data-change="description" value="'+element['description']+'">';
             liElementToInsert += '</label>';
+            if(framework.video_url_support){
+                liElementToInsert += '<label class="setting" data-setting="video">';
+                liElementToInsert += '<span>' + framework.url + '</span>';
+                liElementToInsert += '<input type="text" class="data-change video" id="edit-video-' + element['id'] + '" data-change="video" value="">';
+                liElementToInsert += '</label>' 
+            }
+            
             liElementToInsert += '</div> <!--/ht-gallery-item-attributes -->'; 
        } catch(err) {
             liElementToInsert += '<img  src="" height="150px" width="150px" />';
@@ -598,6 +616,7 @@ jQuery(document).ready(function($){
     */
     function replacePlaceholderWithAttachment(placeholderID, attachment){
         $( '#' + 'ht-gallery-placeholder-' + placeholderID ).replaceWith( getHTMLForGalleryItem( attachment ) );
+        replaceVideoURL(attachment.id);
         //add spinner to this item until image is loaded
         addSpinnerToLastLoadedItem();
     }
@@ -659,6 +678,88 @@ jQuery(document).ready(function($){
         }  
     });
 
+    /**
+    * Get the video urls for a list of ids
+    */
+    function getVideoURLsForIDs(ids){
+         $.post( url = framework.ajaxurl + "?getvideourls",
+                data = {
+                    'action': 'get-video-urls',
+                    'ids': ids,
+                    'security': framework.ajaxnonce,
+                },
+                success = function(data, textStatus, jqXHR){
+                    if(typeof data === 'undefined'){
+
+                    } else {
+                        if(data.state == 'success'){
+                            //populate the urls
+                           
+                            for(var id in data.urls) {
+                                var url  = data.urls[id] || '';
+                                //set object
+                                videos[id] = url;
+                            }
+                        }
+                    }
+                },
+                dataType = 'json'
+            );
+    }
+
+    function isURLValidVimeoOrYouTube(url){
+        var validURL  = false;
+        var r = new RegExp(/http:\/\/(www\.)?youtube\.com\/watch.*/);
+        validURL = validURL || r.test(url);
+        r = new RegExp(/https:\/\/(www\.)?youtube\.com\/watch.*/);
+        validURL = validURL || r.test(url);
+        r = new RegExp(/https?:\/\/(.+\.)?vimeo\.com\/.*/);
+        validURL = validURL || r.test(url);
+        return validURL;
+
+    }
+
+    //bind the blur event to identify when video url change is complete
+    $('.ht-gallery-item-attributes input.data-change.video').live('blur', function(event, ui) {
+        var firingElement = $('#'+event.target.id);
+        if(firingElement.length<1)
+            return;
+        var urlVal = firingElement.val();
+        if(urlVal != ''){
+           var urlValid = isURLValidVimeoOrYouTube(urlVal);
+            if(!urlValid && changingURL){
+                console.log('Invalid Video URL');
+                alert(urlVal + ' ' + framework.not_valid_url);
+                //set the focus
+                firingElement.focus();
+                //reset changingURL
+                changingURL = false;
+            } 
+        }
+        
+        });
+
+    //bind the change event to detect when we are changing the video url
+    $('.ht-gallery-item-attributes input.data-change.video').live('change', function(event, ui) {
+            changingURL = true;        
+    });
+
+
+
+    /**
+    * Replace a url for a given id with the one loaded in the model
+    *
+    * @param id The id that needs video the url replacing
+    */
+    function replaceVideoURL(id){
+        //get value from data
+        var value = videos[id];
+        //replace value
+        $('input#edit-video-'+id).val(value);
+    }
+
 });
+
+
 
  

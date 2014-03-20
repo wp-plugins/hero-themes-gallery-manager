@@ -1,9 +1,9 @@
 === Heroic Gallery Manager ===
 Contributors: herothemes
-Tags: images, gallery, manager, photos, photography, photo
+Tags: images, gallery, manager, management, photos, photography, photo, tool
 Requires at least: 3.5
 Tested up to: 3.8.1
-Stable tag: 1.16
+Stable tag: 1.17
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,8 +34,9 @@ It's easy to get started
 1. Upload `ht-gallery-manager` to the `/wp-content/plugins/` directory or goto Plugins>Add New and search for Heroic Gallery Manager.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Under the new Heroic Galleries menu option select New Heroic Gallery.
-4. Be sure to click publish/update to save your Heroic Gallery, then copy the shortcode into your post or page where you want the Heroic Gallery to appear or select `Add Heroic Gallery` from the target post or page.
-5. You can star an image, which works in a similar way to featured images. These will appear as a cover image when using a supporting theme.
+4. Be sure to click publish/update to save your Heroic Gallery, then copy the shortcode into your post or page where you want the Heroic Gallery to appear or select `Add Heroic Gallery` from the target post or page. 
+5. If you are using a compatible theme, you do not need to use the shortcode, simply view or link the Heroic Gallery Post directly for enchanced features and functionality.
+6. You can star an image, which works in a similar way to featured images. These will appear as a cover image when using a supporting theme.
 
 == Frequently Asked Questions ==
 
@@ -57,6 +58,11 @@ A. Simply hit the refresh button and the images will be re-loaded.
 
 
 == Changelog ==
+
+= 1.17 =
+
+Added support for YouTube and Vimeo videos for supporting themes
+Added several bug fixes and UI improvements
 
 = 1.16 =
 
@@ -130,3 +136,16 @@ Improved functionality.
 
 Initial release.
 
+== Developer Notes ==
+
+Get galleries as array by using 
+ht_gallery_get_gallery($gallery_id=null)
+
+Get related galleries as array by using
+ht_gallery_get_related($gallery_id = null, $no_of_related = 4, $src_size = null)
+
+Declare theme support for videos with 
+add_theme_support('ht_gallery_video_url_features')
+
+Mute comments (for themes that do not need to implement comments)
+add_theme_support('mute_ht_gallery_comments')

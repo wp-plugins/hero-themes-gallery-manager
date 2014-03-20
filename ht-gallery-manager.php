@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.16
+*	Version: 1.17
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -14,6 +14,8 @@ DEFINE( 'HERO_THEMES_REF_LINK','http://www.herothemes.com/?ref=ht_gallery' );
 DEFINE( 'HT_GALLERY_META_KEY_VALUE', '_ht_gallery_images' );
 DEFINE( 'HT_GALLERY_STARRED_META_KEY_VALUE', '_ht_gallery_starred_image' );
 DEFINE( 'HT_GALLERY_VIEW_META_KEY_VALUE', '_ht_gallery_view' );
+DEFINE( 'HT_GALLERY_VIDEO_URL_META_KEY_VALUE', '_ht_gallery_video_url' );
+DEFINE( 'HT_GALLERY_VIDEO_URL', 'ht_gallery_video_url_features' );
 
 
 if( !class_exists( 'HT_Gallery_Manager' ) ){
@@ -33,6 +35,12 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
             add_action( 'wp_ajax_save_ht_gallery_order', array( $this, 'save_ht_gallery_menu_order_ajax' ) );
             add_action( 'wp_ajax_save_ht_gallery_images', array( $this, 'save_ht_gallery_images_ajax' ) );
             add_action( 'pre_get_posts', array( $this, 'show_all_gallery_posts' ) );
+
+            //custom action to save video url
+            remove_action('wp_ajax_save-attachment', 'wp_ajax_save_attachment', 1);
+            add_action( 'wp_ajax_save-attachment', array( $this, 'ht_gallery_custom_save_attachment' ), 1 );
+            //get video urls
+            add_action( 'wp_ajax_get-video-urls', array( $this, 'ht_gallery_get_video_urls_ajax' ));
             
 			add_filter( 'media_view_settings', array($this, 'ht_gallery_media_view_settings'), 10, 2 );
 			add_shortcode( 'ht_gallery', array( $this , 'ht_gallery_shortcode' ) );
@@ -56,6 +64,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			
 
 			include_once('php/ht-gallery-manager-settings.php');
+			include_once('php/ht-gallery-renderers.php');
+
 		}
 
 
@@ -108,6 +118,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				'show_admin_column'          => true,
 				'show_in_nav_menus'          => true,
 				'show_tagcloud'              => true,
+				'exclude_from_search'        => true,
 			);
 			register_taxonomy( 'ht_gallery_category', 'ht_gallery_post', $args );
 
@@ -135,6 +146,14 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			    'menu_name'          => $plural_item,
 		  	);
 
+			//check if theme supports comments
+			if(current_theme_supports('mute_ht_gallery_comments')){
+				$supports = array( 'title', 'editor', 'page-attributes' );
+			} else {
+				$supports = array( 'title', 'editor', 'page-attributes', 'comments' );
+			}
+
+
 			$args = array(
 				'labels'             => $labels,
 				'public'             => true,
@@ -147,7 +166,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				'has_archive'        => true,
 				'hierarchical'       => false,
 				'menu_position'      => null,
-				'supports'           => array( 'title', 'editor', 'page-attributes', 'comments' )
+				'supports'           => $supports
 			);
 
 		  register_post_type( 'ht_gallery_post', $args );
@@ -186,6 +205,24 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 			}
 			return $default_slug;
 		}
+
+		/**
+		* Get the default post limit
+		*/
+		public function get_ht_post_limit(){
+			$gallery_options_array = get_option( 'ht_gallery_manager_options' );
+			$default_limit = '100000';
+			if( $gallery_options_array ){
+				if( is_array($gallery_options_array) && array_key_exists( 'ht_posts_limit_value', $gallery_options_array ) ){
+					$user_defined_post_limit = $gallery_options_array['ht_posts_limit_value'];
+					if($user_defined_post_limit!=''){
+						$default_slug = $user_defined_post_limit;
+					}
+				}
+			}
+			return $default_limit;
+		}
+
 
 
 		/**
@@ -321,6 +358,11 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		 */
 		public function render_hero_gallery_meta_box_shortcode_info( $post ) {
 			printf( __( 'To use this Heroic Gallery enter the shortcode <b>[ht_gallery id="%s" name="%s"]</b> in your post or page or use the Insert Heroic Gallery button.', 'ht-gallery-manager' ), $post->ID, $post->post_title );
+			echo '<br/><br/>';
+			if(current_theme_supports('hero-gallery-manager'))
+				printf( __( 'As you are using a theme that supports the Heroic Gallery Manager, you only need to use this shortcode to display images inline in posts and can link directly to this %sHeroic Gallery%s.', 'ht-gallery-manager' ), '<a href="'.get_permalink($post->ID).'">', '</a>'  );
+			else
+				printf( __( 'The current theme does not support Heroic Gallery Manager, you will need to use this shortcode to display galleries in posts.', 'ht-gallery-manager' ) );
 		}
 
 
@@ -471,11 +513,24 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				wp_enqueue_script('plupload-all'); 
 				wp_enqueue_script( 'ht-gallery-manager-scripts', plugins_url( 'js/ht-gallery-manager-scripts.js', __FILE__ ), array( 'jquery' , 'jquery-effects-core', 'jquery-ui-draggable', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-sortable' ), 1.1, true );
 				wp_enqueue_style( 'ht-gallery-manager-style', plugins_url( 'css/ht-gallery-manager-style.css', __FILE__ ));
-				wp_localize_script( 'ht-gallery-manager-scripts', 'framework', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ), 'ajaxnonce' => wp_create_nonce("ht-ajax-nonce") ) );
+				$localization_array = array( 
+					'ajaxurl' 	=> admin_url( 'admin-ajax.php' ), 
+					'ajaxnonce' => wp_create_nonce('ht-ajax-nonce'),
+					'title' 	=> __('Title', 'ht_gallery_manager'),
+					'caption' 	=> __('Caption', 'ht_gallery_manager'),
+					'alt' 		=> __('Alternative Text', 'ht_gallery_manager'),
+					'description' => __('Description', 'ht_gallery_manager'),
+					'url'		 => __('Video URL (YouTube or Vimeo)', 'ht_gallery_manager'),
+					'not_valid_url' => __('appears not be a valid YouTube or Vimeo URL', 'ht_gallery_manager'),
+					'video_url_support'		=> current_theme_supports(HT_GALLERY_VIDEO_URL));
+				wp_localize_script( 'ht-gallery-manager-scripts', 'framework', $localization_array );
 				$this->uploader_localize();
 			} else if( $screen->post_type == 'ht_gallery_post' && $screen->base == 'edit' ) {
 				wp_enqueue_script( 'ht-gallery-sorter-scripts', plugins_url( 'js/ht-gallery-sorter-scripts.js', __FILE__ ), array( 'jquery' , 'jquery-effects-core', 'jquery-ui-draggable', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-sortable' ), 1.0, true );
-				wp_localize_script( 'ht-gallery-sorter-scripts', 'framework', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ), 'ajaxnonce' => wp_create_nonce("ht-ajax-nonce") ) );
+				$localization_array = array( 
+					'ajaxurl' => admin_url( 'admin-ajax.php' ), 
+					'ajaxnonce' => wp_create_nonce('ht-ajax-nonce') );
+				wp_localize_script( 'ht-gallery-sorter-scripts', 'framework', $localization_array );
 				wp_enqueue_style( 'ht-gallery-sorter-style', plugins_url( 'css/ht-gallery-sorter-style.css', __FILE__ ));
 
 			}
@@ -601,6 +656,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* Get current Hero Galleries
 		*/
 		function ht_get_galleries(){
+			add_filter( 'posts_where', array($this, 'get_ht_galleries_filter') ); 
 			$args = array(
 				'offset'           => 0,
 				'category'         => '',
@@ -615,7 +671,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				'post_mime_type'   => '',
 				'post_parent'      => '',
 				'post_status'      => 'publish',
-				'suppress_filters' => true );
+				'suppress_filters' => false );
 
 			$ht_gallery_posts = get_posts( $args );
 			$gallery_names = array();
@@ -624,7 +680,22 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				array_push( $gallery_names, array( 'id' => $ht_gallery_post->ID, 'name' => $ht_gallery_post->post_title ) );
 			}
 
+			remove_filter( 'posts_where', array($this, 'get_ht_galleries_filter') );
+
 			return $gallery_names;
+		}
+
+		/**
+		* A filter to overcome the WP limitation of get_posts args not working on both post_type and post_status simulataneously
+		* @param $where The where clause to modify
+		* @return $where The modified where clause
+		*/
+		function get_ht_galleries_filter($where = ''){
+			global $wpdb;
+ 			//include private galleries in get galleries
+		    $where .= $wpdb->prepare( ' OR ( post_status = %s AND post_type = %s )', 'private', 'ht_gallery_post' );
+		 
+		    return $where;
 		}
 
 		/**
@@ -731,7 +802,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		    
 			if( is_admin() && $screen && $screen->post_type == 'ht_gallery_post' && $screen->base == 'edit' ) {
 		        //-1 doesn't work here, need to use large int
-		        $query->set('posts_per_page', '100000');
+		        $post_limit = $this->get_ht_post_limit();
+		        $query->set('posts_per_page', $post_limit);
 		        $query->set('orderby', 'menu_order');
 		        $query->set('order', 'ASC');
 
@@ -837,8 +909,10 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		*
 		* @param $post_id The post id of the Heroic Gallery
 		*/
-		public static function get_starred_image($gallery_post_id){
+		public static function get_starred_image($gallery_post_id=null){
 			$starred_image = '';
+
+			$gallery_post_id = empty($gallery_post_id) ? get_the_ID() : $gallery_post_id;
 
 			//get the post meta for starred image
 			$starred_image = get_post_meta( $gallery_post_id, HT_GALLERY_STARRED_META_KEY_VALUE, true );
@@ -862,7 +936,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* @param $size The size required, either a string or Array(x, y) (Default 'thumbnail') 
 		* @return an HTML img element or empty string on failure.
 		*/
-		public static function get_starred_image_thumbnail($gallery_post_id, $size = 'thumbnail'){
+		public static function get_starred_image_thumbnail($gallery_post_id=null, $size = 'thumbnail'){
+			$gallery_post_id = empty($gallery_post_id) ? get_the_ID() : $gallery_post_id;
 			return wp_get_attachment_image( HT_Gallery_Manager::get_starred_image( $gallery_post_id ) , $size  );
 		}
 
@@ -873,7 +948,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* @param $size The size required, either a string or Array(x, y) (Default 'thumbnail') 
 		* @return array [0] => url, [1] => width, [2] => height, [3] => boolean: true if $url is a resized image, false if it is the original.
 		*/
-		public static function get_starred_image_src($gallery_post_id, $size = 'thumbnail'){
+		public static function get_starred_image_src($gallery_post_id=null, $size = 'thumbnail'){
+			$gallery_post_id = empty($gallery_post_id) ? get_the_ID() : $gallery_post_id;
 			return wp_get_attachment_image_src( HT_Gallery_Manager::get_starred_image( $gallery_post_id ) , $size  );
 		}
 
@@ -883,7 +959,8 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* @param $gallery_post_id The Post ID of the gallery
 		* @return int Count of items in gallery
 		*/
-		public static function get_hero_gallery_image_count($gallery_post_id){
+		public static function get_hero_gallery_image_count($gallery_post_id=null){
+			$gallery_post_id = empty($gallery_post_id) ? get_the_ID() : $gallery_post_id;
 			$gallery_ids = get_post_meta( $gallery_post_id, HT_GALLERY_META_KEY_VALUE, true );
 			$gallery_array = $gallery_ids != '' ? explode( ',', $gallery_ids ) : array();
 			return count( $gallery_array );
@@ -895,10 +972,41 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* @param $gallery_post_id The Post ID of the gallery
 		* @return an array of images
 		*/
-		public static function get_hero_gallery_images($gallery_post_id){
-			$ht_gallery = get_post_meta( get_the_ID(), HT_GALLERY_META_KEY_VALUE, true );
+		public static function get_hero_gallery_images($gallery_post_id=null){
+			$gallery_post_id = empty($gallery_post_id) ? get_the_ID() : $gallery_post_id;
+			$ht_gallery = get_post_meta( $gallery_post_id, HT_GALLERY_META_KEY_VALUE, true );
 			$ht_gallery = is_a($ht_gallery, 'WP_Error') ? array() : explode(",", $ht_gallery);
+			return $ht_gallery;
 		}
+
+		/**
+		* Get the related post by taxonomy
+		*
+		* @param $post_id The ID of the post
+		* @param $taxonomy The taxonomy to query
+		* @param $no_of_items The number of related posts to get
+		* @return $query The WP query results
+		*/
+		public static function ht_gallery_get_posts_related_by_taxonomy($post_id, $taxonomy = 'ht_gallery_category', $no_of_items = 4) {
+	        $query = new WP_Query();
+	        $terms = wp_get_object_terms($post_id, $taxonomy);
+		        if (count($terms) > 0) {
+		        // Assumes only one term for per post in this taxonomy
+		        $post_ids = get_objects_in_term($terms[0]->term_id,$taxonomy);
+		        $post = get_post($post_id);
+				$args = '';
+		        $args = wp_parse_args($args,array(
+		            'post_type' => $post->post_type, // The assumes the post types match
+		            'post__not_in' => array($post_id),
+		            'taxonomy' => $taxonomy,
+		            'term' => $terms[0]->slug,
+		            'orderby' => 'rand',
+		            'posts_per_page' => $no_of_items
+		        ));
+		        $query = new WP_Query($args);
+	        }
+	        return $query;
+	    }
 
 
 
@@ -992,6 +1100,54 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		}
 
 
+		/**
+		* Intercept the save attachment ajax with a custom function to dave the video url
+		*/
+		function ht_gallery_custom_save_attachment(){
+			if ( ! isset( $_REQUEST['id'] ) || ! isset( $_REQUEST['changes'] ) )
+				wp_send_json_error();
+
+			if ( ! $id = absint( $_REQUEST['id'] ) )
+				wp_send_json_error();
+
+			check_ajax_referer( 'update-post_' . $id, 'nonce' );
+
+			$changes = $_REQUEST['changes'];
+			$post    = get_post( $id, ARRAY_A );
+
+			if ( isset( $changes['video'] ) ){
+				$new_video_url = $changes['video'];
+				update_post_meta($id, HT_GALLERY_VIDEO_URL_META_KEY_VALUE, $new_video_url);
+			}
+				
+
+			//do default WorPress function
+			wp_ajax_save_attachment();
+		}
+
+
+		/**
+		* AJAX function to get the video urls
+		*/
+		function ht_gallery_get_video_urls_ajax(){
+			//check_ajax_referer( 'ht-ajax-nonce', 'security' );
+			try{
+				$ids =  $_POST['ids'];
+				$urls = array();
+
+				foreach ($ids as $key => $attachment_id) {
+					$url = get_post_meta( $attachment_id, HT_GALLERY_VIDEO_URL_META_KEY_VALUE, true  );
+					$urls[$attachment_id] = $url;
+				}
+				//return success
+				echo json_encode(array('state' => 'success', 'urls' => $urls));
+			} catch (Exception $e){
+				//return failure
+				echo json_encode(array('state' => 'failure', 'message' => $e->getMessage() ) );
+			}
+			die(); // this is required to return a proper result
+		}
+
 
 		
 
@@ -1005,3 +1161,4 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 if( class_exists( 'HT_Gallery_Manager' ) ){
 	$ht_gallery_manager_init = new HT_Gallery_Manager();
 }
+

@@ -120,6 +120,21 @@ class HT_Gallery_Manager_Settings_Page {
             'gallery_slug'           
         ); 
 
+        add_settings_section(
+            'ht_posts_limit_section', 
+            __( 'Post Limit' , 'ht-gallery-manager'), 
+            array( $this, 'ht_posts_limit_section_callback' ), 
+            'ht-gallery-manager-options' 
+        );
+
+        add_settings_field(
+            'ht_posts_limit_value', 
+            __( 'Post Limit' , 'ht-gallery-manager'), 
+            array( $this, 'ht_posts_limit_field_callback' ), 
+            'ht-gallery-manager-options', 
+            'ht_posts_limit_section'           
+        ); 
+
        
     }
 
@@ -141,9 +156,18 @@ class HT_Gallery_Manager_Settings_Page {
             $new_input['category_slug'] = sanitize_title( $input['category_slug'] );
         }
 
+        if( isset( $input['ht_posts_limit_value'] ) ){
+            //use santize key to ensure we get a santized alphanumeric value here
+            $new_input['ht_posts_limit_value'] = sanitize_key( $input['ht_posts_limit_value'] );
+        }
+
         //validate
         if( $new_input['category_slug'] ==  $new_input['post_slug'] &&  $new_input['category_slug']  != '' &&  $new_input['post_slug'] != '' ){
             add_settings_error( 'ht-gallery-manager-options', 'invalid-slugs', __('The slugs cannot be the same.', 'ht-gallery-manager' ) );
+            $new_input = $old_value;
+        } else if ( !is_numeric($new_input['ht_posts_limit_value']) ){
+            print_r($new_input['ht_posts_limit_value']);
+            add_settings_error( 'ht-gallery-manager-options', 'invalid-post-limit', __('The post limit must be numeric', 'ht-gallery-manager' ) );
             $new_input = $old_value;
         } else {
             //flush the rewrite rules
@@ -179,6 +203,24 @@ class HT_Gallery_Manager_Settings_Page {
         printf(
             '<input type="text" id="category_slug" name="ht_gallery_manager_options[category_slug]" value="%s" />',
             isset( $this->options['category_slug'] ) ? esc_attr( $this->options['category_slug']) : ''
+        );
+    }
+
+
+    /** 
+     * Print the section title
+     */
+    public function ht_posts_limit_section_callback(){
+        _e('Heroic Gallery Posts Limit', 'ht-gallery-manager');
+    }
+
+    /** 
+     * Get the settings option array and print one of its values
+     */
+    public function ht_posts_limit_field_callback() {
+        printf(
+            '<input type="text" id="ht_posts_limit_value" name="ht_gallery_manager_options[ht_posts_limit_value]" value="%s" />',
+            isset( $this->options['ht_posts_limit_value'] ) ? esc_attr( $this->options['ht_posts_limit_value']) : '100000'
         );
     }
 
