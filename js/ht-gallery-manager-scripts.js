@@ -713,6 +713,8 @@ jQuery(document).ready(function($){
         validURL = validURL || r.test(url);
         r = new RegExp(/https:\/\/(www\.)?youtube\.com\/watch.*/);
         validURL = validURL || r.test(url);
+        var r = new RegExp(/http:\/\/(www\.)?youtu\.be\/.*/);
+        validURL = validURL || r.test(url);
         r = new RegExp(/https?:\/\/(.+\.)?vimeo\.com\/.*/);
         validURL = validURL || r.test(url);
         return validURL;

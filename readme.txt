@@ -3,7 +3,7 @@ Contributors: herothemes
 Tags: images, gallery, manager, management, photos, photography, photo, tool
 Requires at least: 3.5
 Tested up to: 3.8.1
-Stable tag: 1.17
+Stable tag: 1.18
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,6 +58,11 @@ A. Simply hit the refresh button and the images will be re-loaded.
 
 
 == Changelog ==
+
+= 1.18 =
+
+Added support for youtu.be urls in video link
+Bug fix for empty related galleries
 
 = 1.17 =
 

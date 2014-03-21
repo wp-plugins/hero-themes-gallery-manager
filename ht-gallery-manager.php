@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.17
+*	Version: 1.18
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -430,7 +430,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 			<ul class="ht-gallery-manager-bar top clearfix">	
 				<li>
-					<a href="#" id=""  class="ht-gallery-add-images button button-secondary" title="<?php _e( 'Add Images', 'ht-gallery-manager' ); ?>"><?php _e( 'Select Images', 'ht-gallery-manager' ); ?></a>
+					<a href="#" id=""  class="ht-gallery-add-images button button-secondary" title="<?php _e( 'Add Images', 'ht-gallery-manager' ); ?>"><?php _e( 'Add Images', 'ht-gallery-manager' ); ?></a>
 				</li>
 				<li>
 					<a href="#" id=""  class="ht-gallery-refresh-images button button-secondary" title="<?php _e( 'Refresh Images', 'ht-gallery-manager' ); ?>"><?php _e( 'Refresh Images', 'ht-gallery-manager' ); ?></a>
@@ -477,7 +477,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 			<ul class="ht-gallery-manager-bar bottom clearfix">	
 				<li>
-					<a href="#" id=""  class="ht-gallery-add-images button button-secondary" title="<?php _e( 'Add Images', 'ht-gallery-manager' ); ?>"><?php _e( 'Select Images', 'ht-gallery-manager' ); ?></a>
+					<a href="#" id=""  class="ht-gallery-add-images button button-secondary" title="<?php _e( 'Add Images', 'ht-gallery-manager' ); ?>"><?php _e( 'Add Images', 'ht-gallery-manager' ); ?></a>
 				</li>
 				<li>
 					<a href="#" id=""  class="ht-gallery-refresh-images button button-secondary" title="<?php _e( 'Refresh Images', 'ht-gallery-manager' ); ?>"><?php _e( 'Refresh Images', 'ht-gallery-manager' ); ?></a>

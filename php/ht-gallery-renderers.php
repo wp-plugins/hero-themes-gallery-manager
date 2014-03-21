@@ -64,16 +64,21 @@ if(!class_exists('HT_Gallery_Renderers')){
 		*/
 		public static function ht_gallery_get_related($post_id = null, $no_of_related = 4, $src_size = null){
 			$related_galleries = Array();
+			if($no_of_related<1){
+				return $related_galleries;
+			}
 			$post_id = empty($post_id)  ? get_the_ID() : $post_id;
 
-			$related = HT_Gallery_Manager::ht_gallery_get_posts_related_by_taxonomy($post_id, 'ht_gallery_category', $no_of_related);
-			while($related->have_posts()) {
+			$related = HT_Gallery_Manager::ht_gallery_get_posts_related_by_taxonomy($post_id, 'ht_gallery_category', $no_of_related*2);
+			$related_item_count = 0;
+			while($related->have_posts() && $related_item_count<$no_of_related) {
 				$related->the_post();
 				//the empty array
 				$related_post = array();
 				//fill id
 				$related_id = get_the_ID();
 				$related_post['id'] = $related_id;
+
 
 				//permalink
 				$related_permalink = get_post_permalink($related_id);
@@ -87,12 +92,15 @@ if(!class_exists('HT_Gallery_Renderers')){
 				$related_starred_image = wp_get_attachment_image_src($related_starred_id, $src_size);
 				$related_post['starred_image'] = $related_starred_image;
 
-				//push the related_post
-				array_push( $related_galleries, $related_post );
+				//push the related_post if starred image id not empty
+				if(!empty($related_starred_image)){
+					array_push( $related_galleries, $related_post );
+					$related_item_count = $related_item_count + 1;
+				}				
+
 			} 
 
 			//do we need to reset the post here?
-
 			return $related_galleries;
 		}
 
