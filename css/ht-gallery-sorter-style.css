@@ -25,6 +25,10 @@
 	
 }
 
+table.wp-list-table th.column-id{
+	width: 80px;
+}
+
 table.wp-list-table th.column-order{
 	width: 100px;
 }

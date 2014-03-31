@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.18
+*	Version: 1.19
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -65,6 +65,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 			include_once('php/ht-gallery-manager-settings.php');
 			include_once('php/ht-gallery-renderers.php');
+			include_once('php/ht-gallery-widgets.php');
 
 		}
 
@@ -831,6 +832,9 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* @param $columns The initial columns passed from the filter
 		*/
 		function ht_gallery_columns($columns){
+			$id_columns = array(
+				'id' => __('ID', 'ht-gallery-manager')
+			);
 			$preview_columns = array(
 				'prev' => __('Preview', 'ht-gallery-manager')
 			);
@@ -838,7 +842,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 				'order' => __('Order', 'ht-gallery-manager')
 			);
 	    	//return array_merge(array_slice($columns, 0, 1), $preview_columns, array_slice($columns, 1), $order_columns);
-	    	return array_merge($columns, $preview_columns, $order_columns);
+	    	return array_merge($columns, $id_columns, $preview_columns, $order_columns);
 		}
 
 		/**
@@ -850,7 +854,9 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		function ht_gallery_custom_column( $column, $post_id ) {
 			global $post;
 		    switch ( $column ) {
-
+		    	case 'id' :
+		            echo '<div class="ht-gallery post-id">' . $post_id . '</div>';
+		            break;
 		        case 'order' :
 		            echo '<div class="ht-gallery post-order" data-post-id="' . $post->ID . '" data-menu-order="' . $post->menu_order . '">' . $post->menu_order . '</div>';
 		            break;

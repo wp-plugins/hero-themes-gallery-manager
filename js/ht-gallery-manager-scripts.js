@@ -137,7 +137,7 @@ jQuery(document).ready(function($){
         currentSelection.forEach(function(element) {
               idList.push(element['id']);
             });
-        var concatIDs = currentIDs.concat(idList);
+        var concatIDs = arrayUnique(currentIDs.concat(idList));
         //return concated IDs
         return concatIDs;
     }
@@ -226,7 +226,7 @@ jQuery(document).ready(function($){
 
             //$('#thumbnails').append($('<li><img src="/photos/t/'+data.filename+'"/></li>').hide().fadeIn(2000));
         });
-        updateGalleryCount(currentSelection.length);
+        updateGalleryCount();
 
     }
 
@@ -761,6 +761,25 @@ jQuery(document).ready(function($){
     }
 
 });
+
+
+//adapted from http://stackoverflow.com/a/1584377/2985710
+function arrayUnique(array) {
+    var a = array.concat();
+    for(var i=0; i<a.length; ++i) {
+        if(a[i]===undefined || a[i]==""){
+            a.splice(i, 1);
+            continue;
+        }
+            
+        for(var j=i+1; j<a.length; ++j) {
+            if(a[i] == a[j])
+                a.splice(j--, 1);
+        }
+    }
+
+    return a;
+};
 
 
 
