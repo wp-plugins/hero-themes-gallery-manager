@@ -1,0 +1,38 @@
+#the-list tr{
+	cursor: move;
+}
+
+#the-list tr.posts-sortable-placeholder{
+	visibility: visible; 
+	height: 50px;
+
+	overflow: hidden;
+	display: block;
+}
+
+/*
+#the-list tr.ui-sortable-helper{
+	visibility: visible; 
+	background-color: red;
+	width: 1500px;
+
+	overflow: hidden;
+	display: block;
+}
+*/
+
+#the-list tr.ui-sortable-placeholder{
+	
+}
+
+table.wp-list-table th.column-id{
+	width: 80px;
+}
+
+table.wp-list-table th.column-order{
+	width: 100px;
+}
+
+table.wp-list-table th.column-prev{
+	width: 80px;
+}
