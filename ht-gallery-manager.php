@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.19
+*	Version: 1.20
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -455,7 +455,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 			<div class="ht-gallery-manager-gallery-empty">
 					<span><?php _e( 'Gallery Empty', 'ht-gallery-manager' ); ?></span><br/><br/>
-					<a href="#" id=""  class="ht-gallery-add-images button button-secondary" title="<?php _e( 'Add Images', 'ht-gallery-manager' ); ?>"><?php _e( 'Click to Add Images', 'ht-gallery-manager' ); ?></a>
+					<a href="#" id="ht-select-files"  class="ht-gallery-add-images button button-secondary" title="<?php _e( 'Add Images', 'ht-gallery-manager' ); ?>"><?php _e( 'Select Images', 'ht-gallery-manager' ); ?></a>
 			</div>
 
 			<!-- gallery content  -->	
@@ -507,12 +507,16 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 		* Enqueue scripts and styles
 		*/
 		function enqueue_ht_gallery_manager_scripts_and_styles(){
+			global $wp_version;
 			//localize?
 			$screen = get_current_screen();
 
+			//use new uploader
+			$pl2 = $wp_version >= 3.9 ? true : false;
+
 			if( $screen->post_type == 'ht_gallery_post' && $screen->base == 'post' ) {
 				wp_enqueue_script('plupload-all'); 
-				wp_enqueue_script( 'ht-gallery-manager-scripts', plugins_url( 'js/ht-gallery-manager-scripts.js', __FILE__ ), array( 'jquery' , 'jquery-effects-core', 'jquery-ui-draggable', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-sortable' ), 1.1, true );
+				wp_enqueue_script( 'ht-gallery-manager-scripts', plugins_url( 'js/ht-gallery-manager-scripts.js', __FILE__ ), array( 'jquery' , 'jquery-effects-core', 'jquery-ui-draggable', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-sortable', 'plupload' ), 1.1, true );
 				wp_enqueue_style( 'ht-gallery-manager-style', plugins_url( 'css/ht-gallery-manager-style.css', __FILE__ ));
 				$localization_array = array( 
 					'ajaxurl' 	=> admin_url( 'admin-ajax.php' ), 
@@ -520,6 +524,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 					'title' 	=> __('Title', 'ht_gallery_manager'),
 					'caption' 	=> __('Caption', 'ht_gallery_manager'),
 					'alt' 		=> __('Alternative Text', 'ht_gallery_manager'),
+					'pl2'		=> $pl2,
 					'description' => __('Description', 'ht_gallery_manager'),
 					'url'		 => __('Video URL (YouTube or Vimeo)', 'ht_gallery_manager'),
 					'not_valid_url' => __('appears not be a valid YouTube or Vimeo URL', 'ht_gallery_manager'),

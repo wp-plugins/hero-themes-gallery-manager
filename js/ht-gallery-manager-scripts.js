@@ -174,9 +174,9 @@ jQuery(document).ready(function($){
                 var alreadyStarred = $( this ).hasClass('starred');
                 if(id){
                     if ( alreadyStarred ) {
-                        setStarredImage("");
+                        setStarredImage("", true);
                     } else {
-                       setStarredImage(id); 
+                       setStarredImage(id, true); 
                     }
                     
                 }     
@@ -532,12 +532,27 @@ jQuery(document).ready(function($){
 
         pconfig.multi_selection = true;
 
-        var uploader = new plupload.Uploader( pconfig );
+        
 
-        uploader.bind( 'Init', function( up ){} );
+        if(framework.pl2){
+            //wp version <= 3.9
+            var galleryUploader = new wp.Uploader( {
+                    container: '#'+pconfig.container,
+                    browser: '#ht-select-files',
+                    dropzone: '#'+pconfig.drop_element,
+                    params: pconfig.multipart_params
+                } );
 
-        uploader.init();
+            var uploader = galleryUploader.uploader;
 
+        } else {
+            //wp version < 3.9
+            var uploader = new plupload.Uploader( pconfig );
+            //initialize the uploader
+            uploader.bind( 'Init', function( up ){} );
+            uploader.init();
+
+        }
 
         // a file was added in the queue
         uploader.bind( 'FilesAdded', function( up, files )
@@ -577,6 +592,7 @@ jQuery(document).ready(function($){
                             });        
             
         });
+
 
     });
 
@@ -642,8 +658,9 @@ jQuery(document).ready(function($){
     * Set the starred image for a given imageID
     *
     * @param imageID The image ID to set as starred
+    * @param saveRequired Whether a save is required (set manually)
     */
-    function setStarredImage(imageID){
+    function setStarredImage(imageID, saveRequired){
         $('#ht_gallery_starred_image').val(imageID);
         //remove starred from existing starred items
         $('.star-ht-gallery-item').removeClass('starred');
@@ -653,7 +670,10 @@ jQuery(document).ready(function($){
         $('li.gallery-item.starred').removeClass('starred');
         //add starred class to li item
         $('li#gallery-item-'+imageID).addClass('starred');
-        saveImageOrder();
+        if(saveRequired){
+            saveImageOrder();
+        }
+        
     }
 
 
@@ -661,7 +681,7 @@ jQuery(document).ready(function($){
     * Set the starred image from the preset meta value
     */
     function setStarredImageFromVal(){
-        setStarredImage( $('#ht_gallery_starred_image').val() );
+        setStarredImage( $('#ht_gallery_starred_image').val() , false );
     }
 
     //drag enter event
