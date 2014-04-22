@@ -1,6 +1,7 @@
 var HTAjaxFramework = {
     // dummy url - replaced by WordPresses localize scripts function
     ajaxurl: "http://example.com/wordpress/wp-admin/admin-ajax.php",
+    ajaxnonce: "abcdef",
 };
 
 var pconfig=false;
@@ -9,6 +10,12 @@ jQuery(document).ready(function($){
     
     // prepare the variables that holds the custom media management tool and current selection.
     var heroGalleryManagementTool, heroGallerySelection, lastReplacedID;
+
+    //store an array of videos
+    var videos = [];
+
+    //keep a rercord of changing url
+    var changingURL = false;
     
     // if the frame already exists, re-open it.
     if (heroGalleryManagementTool) {
@@ -79,6 +86,8 @@ jQuery(document).ready(function($){
     */
     function loadIDsIntoSelection(ids){
         var selection = heroGalleryManagementTool.state().get('selection');
+        //get videos
+        getVideoURLsForIDs(ids);
         //reset
         selection.reset();
         ids.forEach(function(id) {
@@ -122,12 +131,15 @@ jQuery(document).ready(function($){
     * Get the current selection as an array of IDs
     */
     function getHeroGallerySelectionAsIDs() {
+        var currentIDs = $('#ht_gallery_values').val().split(',');
         var idList = [];
         var currentSelection = heroGallerySelection ? heroGallerySelection : [];
         currentSelection.forEach(function(element) {
               idList.push(element['id']);
             });
-        return idList;
+        var concatIDs = arrayUnique(currentIDs.concat(idList));
+        //return concated IDs
+        return concatIDs;
     }
     
 
@@ -162,9 +174,9 @@ jQuery(document).ready(function($){
                 var alreadyStarred = $( this ).hasClass('starred');
                 if(id){
                     if ( alreadyStarred ) {
-                        setStarredImage("");
+                        setStarredImage("", true);
                     } else {
-                       setStarredImage(id); 
+                       setStarredImage(id, true); 
                     }
                     
                 }     
@@ -214,7 +226,7 @@ jQuery(document).ready(function($){
 
             //$('#thumbnails').append($('<li><img src="/photos/t/'+data.filename+'"/></li>').hide().fadeIn(2000));
         });
-        updateGalleryCount(currentSelection.length);
+        updateGalleryCount();
 
     }
 
@@ -234,7 +246,7 @@ jQuery(document).ready(function($){
         liElementToInsert += '</div><!-- /gallery-item-starred-tools -->';
 
         liElementToInsert += '<div id="edit-gallery-item-' + element['id'] + '" class="gallery-item-edit-tools">';
-        liElementToInsert += '<a href="' + element['editLink'] + '" class="edit-ht-gallery-item" data-edit-id="' + element['id'] + '"> </a>';
+        liElementToInsert += '<a href="' + element['editLink'] + '" class="edit-ht-gallery-item" data-edit-id="' + element['id'] + '" target="_blank"> </a>';
         liElementToInsert += '<a href="#" class="delete-ht-gallery-item" data-delete-id="' + element['id'] + '"> </a>';
         liElementToInsert += '</div><!-- /gallery-item-edit-tools -->';
         var thumbnail = null;
@@ -255,21 +267,28 @@ jQuery(document).ready(function($){
       
             //todo ajaxify form ;) and i18n
             liElementToInsert += '<label class="setting" data-setting="title">';
-            liElementToInsert += '<span>Title</span>';
+            liElementToInsert += '<span>' + framework.title + '</span>';
             liElementToInsert += '<input type="text" class="data-change title" id="edit-title-' + element['id'] + '" data-change="title" value="'+element['title']+'">';
             liElementToInsert += '</label>';
             liElementToInsert += '<label class="setting" data-setting="caption">';
-            liElementToInsert += '<span>Caption</span>';
+            liElementToInsert += '<span>' + framework.caption + '</span>';
             liElementToInsert += '<input type="text" class="data-change caption" id="edit-caption-' + element['id'] + '" data-change="caption" value="'+element['caption']+'">';
             liElementToInsert += '</label>';
             liElementToInsert += '<label class="setting" data-setting="alt">';
-            liElementToInsert += '<span>Alternative Text</span>';
+            liElementToInsert += '<span>' + framework.alt + '</span>';
             liElementToInsert += '<input type="text" class="data-change alt" id="edit-alt-' + element['id'] + '" data-change="alt" value="'+element['alt']+'">';
             liElementToInsert += '</label>';
             liElementToInsert += '<label class="setting" data-setting="description">';
-            liElementToInsert += '<span>Description</span>';
+            liElementToInsert += '<span>' + framework.description + '</span>';
             liElementToInsert += '<input type="text" class="data-change description" id="edit-description-' + element['id'] + '" data-change="description" value="'+element['description']+'">';
             liElementToInsert += '</label>';
+            if(framework.video_url_support){
+                liElementToInsert += '<label class="setting" data-setting="video">';
+                liElementToInsert += '<span>' + framework.url + '</span>';
+                liElementToInsert += '<input type="text" class="data-change video" id="edit-video-' + element['id'] + '" data-change="video" value="">';
+                liElementToInsert += '</label>' 
+            }
+            
             liElementToInsert += '</div> <!--/ht-gallery-item-attributes -->'; 
        } catch(err) {
             liElementToInsert += '<img  src="" height="150px" width="150px" />';
@@ -327,6 +346,7 @@ jQuery(document).ready(function($){
         },
         stop: function( event, ui ) {
             syncListWithIDs();
+            saveImageOrder();
         },
         start: function( event, ui ) {
             //can add text placeholder here if required
@@ -343,6 +363,7 @@ jQuery(document).ready(function($){
         $('#gallery-item-' + id).hide( 'slow', function(){ 
             $('#gallery-item-' + id).remove(); 
             syncListWithIDs(); 
+            saveImageOrder();
             updateGalleryCount(); 
         } );
     }
@@ -361,6 +382,30 @@ jQuery(document).ready(function($){
            separator = ',';
         });
         $('#ht_gallery_values').val(newListString);
+    }
+
+    /**
+    * Saves the list order
+    */
+    function saveImageOrder(){
+        var listOrder = $('#ht_gallery_values').val();
+        var starredImage = $('#ht_gallery_starred_image').val();
+        //shout save, even if empty list
+        saveImages(listOrder, starredImage);
+    }
+
+    function saveImages(imagesList, starredImage){
+        $.post( url = framework.ajaxurl + "?saveimages",
+                data = {
+                    'action': 'save_ht_gallery_images',
+                    'images': imagesList,
+                    'starred': starredImage,
+                    'post_id' : $( "input#post_ID" ).val() || 0,
+                    'security': framework.ajaxnonce,
+                },
+                success = function(data, textStatus, jqXHR){
+                }
+            );
     }
 
     /**
@@ -479,18 +524,35 @@ jQuery(document).ready(function($){
                 action      : htGalleryUploaderInit.multipart_params.action,
                 imgid       : uploaderId,
                 galleryName : $( '#' + uploaderId + '-gallery-name' ).val(),
-                parentId    : $( "input#post_ID" ).val() || 0
+                post_id    : $( "input#post_ID" ).val() || 0,
+                short       : false,
+                long        : true
             }
         };
 
         pconfig.multi_selection = true;
 
-        var uploader = new plupload.Uploader( pconfig );
+        
 
-        uploader.bind( 'Init', function( up ){} );
+        if(framework.pl2){
+            //wp version <= 3.9
+            var galleryUploader = new wp.Uploader( {
+                    container: '#'+pconfig.container,
+                    browser: '#ht-select-files',
+                    dropzone: '#'+pconfig.drop_element,
+                    params: pconfig.multipart_params
+                } );
 
-        uploader.init();
+            var uploader = galleryUploader.uploader;
 
+        } else {
+            //wp version < 3.9
+            var uploader = new plupload.Uploader( pconfig );
+            //initialize the uploader
+            uploader.bind( 'Init', function( up ){} );
+            uploader.init();
+
+        }
 
         // a file was added in the queue
         uploader.bind( 'FilesAdded', function( up, files )
@@ -531,6 +593,7 @@ jQuery(document).ready(function($){
             
         });
 
+
     });
 
     /**
@@ -569,6 +632,7 @@ jQuery(document).ready(function($){
     */
     function replacePlaceholderWithAttachment(placeholderID, attachment){
         $( '#' + 'ht-gallery-placeholder-' + placeholderID ).replaceWith( getHTMLForGalleryItem( attachment ) );
+        replaceVideoURL(attachment.id);
         //add spinner to this item until image is loaded
         addSpinnerToLastLoadedItem();
     }
@@ -594,8 +658,9 @@ jQuery(document).ready(function($){
     * Set the starred image for a given imageID
     *
     * @param imageID The image ID to set as starred
+    * @param saveRequired Whether a save is required (set manually)
     */
-    function setStarredImage(imageID){
+    function setStarredImage(imageID, saveRequired){
         $('#ht_gallery_starred_image').val(imageID);
         //remove starred from existing starred items
         $('.star-ht-gallery-item').removeClass('starred');
@@ -605,6 +670,10 @@ jQuery(document).ready(function($){
         $('li.gallery-item.starred').removeClass('starred');
         //add starred class to li item
         $('li#gallery-item-'+imageID).addClass('starred');
+        if(saveRequired){
+            saveImageOrder();
+        }
+        
     }
 
 
@@ -612,7 +681,7 @@ jQuery(document).ready(function($){
     * Set the starred image from the preset meta value
     */
     function setStarredImageFromVal(){
-        setStarredImage( $('#ht_gallery_starred_image').val() );
+        setStarredImage( $('#ht_gallery_starred_image').val() , false );
     }
 
     //drag enter event
@@ -629,6 +698,109 @@ jQuery(document).ready(function($){
         }  
     });
 
+    /**
+    * Get the video urls for a list of ids
+    */
+    function getVideoURLsForIDs(ids){
+         $.post( url = framework.ajaxurl + "?getvideourls",
+                data = {
+                    'action': 'get-video-urls',
+                    'ids': ids,
+                    'security': framework.ajaxnonce,
+                },
+                success = function(data, textStatus, jqXHR){
+                    if(typeof data === 'undefined'){
+
+                    } else {
+                        if(data.state == 'success'){
+                            //populate the urls
+                           
+                            for(var id in data.urls) {
+                                var url  = data.urls[id] || '';
+                                //set object
+                                videos[id] = url;
+                            }
+                        }
+                    }
+                },
+                dataType = 'json'
+            );
+    }
+
+    function isURLValidVimeoOrYouTube(url){
+        var validURL  = false;
+        var r = new RegExp(/http:\/\/(www\.)?youtube\.com\/watch.*/);
+        validURL = validURL || r.test(url);
+        r = new RegExp(/https:\/\/(www\.)?youtube\.com\/watch.*/);
+        validURL = validURL || r.test(url);
+        var r = new RegExp(/http:\/\/(www\.)?youtu\.be\/.*/);
+        validURL = validURL || r.test(url);
+        r = new RegExp(/https?:\/\/(.+\.)?vimeo\.com\/.*/);
+        validURL = validURL || r.test(url);
+        return validURL;
+
+    }
+
+    //bind the blur event to identify when video url change is complete
+    $('.ht-gallery-item-attributes input.data-change.video').live('blur', function(event, ui) {
+        var firingElement = $('#'+event.target.id);
+        if(firingElement.length<1)
+            return;
+        var urlVal = firingElement.val();
+        if(urlVal != ''){
+           var urlValid = isURLValidVimeoOrYouTube(urlVal);
+            if(!urlValid && changingURL){
+                console.log('Invalid Video URL');
+                alert(urlVal + ' ' + framework.not_valid_url);
+                //set the focus
+                firingElement.focus();
+                //reset changingURL
+                changingURL = false;
+            } 
+        }
+        
+        });
+
+    //bind the change event to detect when we are changing the video url
+    $('.ht-gallery-item-attributes input.data-change.video').live('change', function(event, ui) {
+            changingURL = true;        
+    });
+
+
+
+    /**
+    * Replace a url for a given id with the one loaded in the model
+    *
+    * @param id The id that needs video the url replacing
+    */
+    function replaceVideoURL(id){
+        //get value from data
+        var value = videos[id];
+        //replace value
+        $('input#edit-video-'+id).val(value);
+    }
+
 });
+
+
+//adapted from http://stackoverflow.com/a/1584377/2985710
+function arrayUnique(array) {
+    var a = array.concat();
+    for(var i=0; i<a.length; ++i) {
+        if(a[i]===undefined || a[i]==""){
+            a.splice(i, 1);
+            continue;
+        }
+            
+        for(var j=i+1; j<a.length; ++j) {
+            if(a[i] == a[j])
+                a.splice(j--, 1);
+        }
+    }
+
+    return a;
+};
+
+
 
  
