@@ -4,7 +4,7 @@
 *	Plugin URI: http://wordpress.org/extend/plugins/ht-gallery-manager/
 *	Description: A Drag and Drop Gallery Manager for WordPress
 *	Author: Hero Themes
-*	Version: 1.20
+*	Version: 1.21
 *	Author URI: http://www.herothemes.com/
 *	Text Domain: ht-gallery-manager
 */
@@ -516,7 +516,7 @@ if( !class_exists( 'HT_Gallery_Manager' ) ){
 
 			if( $screen->post_type == 'ht_gallery_post' && $screen->base == 'post' ) {
 				wp_enqueue_script('plupload-all'); 
-				wp_enqueue_script( 'ht-gallery-manager-scripts', plugins_url( 'js/ht-gallery-manager-scripts.js', __FILE__ ), array( 'jquery' , 'jquery-effects-core', 'jquery-ui-draggable', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-sortable', 'plupload' ), 1.1, true );
+				wp_enqueue_script( 'ht-gallery-manager-scripts', plugins_url( 'js/ht-gallery-manager-scripts.js', __FILE__ ), array( 'jquery' , 'jquery-effects-core', 'jquery-ui-draggable', 'jquery-ui-widget', 'jquery-ui-mouse', 'jquery-ui-sortable', 'plupload' ), 1.21, true );
 				wp_enqueue_style( 'ht-gallery-manager-style', plugins_url( 'css/ht-gallery-manager-style.css', __FILE__ ));
 				$localization_array = array( 
 					'ajaxurl' 	=> admin_url( 'admin-ajax.php' ), 

@@ -3,7 +3,7 @@ Contributors: herothemes
 Tags: images, gallery, manager, management, photos, photography, photo, tool
 Requires at least: 3.5
 Tested up to: 4.1
-Stable tag: 1.20
+Stable tag: 1.21
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,14 +19,26 @@ Note this is a backend management tool, it uses the inbuilt gallery shortcode wh
 
 All of these features, combined with the simplicity of use, makes Hero Gallery Manager one of the best gallery creation and management tools. Better still you are in complete control as it can use it right from your existing WordPress powered site without the expense of 3rd party offerings.
 
-For more themes, plugins and news visit us at [HeroThemes.com](http://www.herothemes.com/?ref=ht_gallery "Hero Themes")
-
 
 **Video Demonstration**
 
 A short video demonstrating the improved workflow benefits using Heroic Gallery Manager:
 
 [youtube http://www.youtube.com/watch?v=0kIxPJLa5vk]
+
+> <strong>Supercharge with Hero Themes</strong><br>
+> Hero Gallery Manager is designed to work seamlessly with our [Focal and Moda premium photography themes](http://www.herothemes.com). This plugin will work as a gallery manager for any other theme but note the theme still controls how galleries are displayed on your site.
+
+> <strong>About Hero Themes</strong><br>
+> Hero Themes develop some of the best WordPress plugins, tools and themes, with over 10,000 customers and counting. If you like this plugin and want more news, themes and plugins, you can do the following:
+> 
+> * Try our [Heroic Favicon Generator for WordPress](https://wordpress.org/plugins/favhero-favicon-generator/).
+> * Check out the [best WordPress Knowledge Base plugin](http://herothemes.com/plugins/heroic-wordpress-knowledge-base/).
+> * Add Social Icons to you site with [Heroic Social Widget](https://wordpress.org/plugins/heroic-social-widget/).
+> * Follow Hero Themes on [Twitter](https://twitter.com/herothemes) & [Facebook](https://www.facebook.com/herothemes).
+
+
+
 
 
 == Installation ==
@@ -60,6 +72,11 @@ A. Simply hit the refresh button and the images will be re-loaded.
 
 
 == Changelog ==
+
+= 1.21 =
+
+Updated to support WP4.1
+Fixed bug with unescaped html in manager
 
 = 1.20 =
 

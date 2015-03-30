@@ -268,19 +268,19 @@ jQuery(document).ready(function($){
             //todo ajaxify form ;) and i18n
             liElementToInsert += '<label class="setting" data-setting="title">';
             liElementToInsert += '<span>' + framework.title + '</span>';
-            liElementToInsert += '<input type="text" class="data-change title" id="edit-title-' + element['id'] + '" data-change="title" value="'+element['title']+'">';
+            liElementToInsert += '<input type="text" class="data-change title" id="edit-title-' + element['id'] + '" data-change="title" value="'+ htEscapeHtml(element['title']) +'">';
             liElementToInsert += '</label>';
             liElementToInsert += '<label class="setting" data-setting="caption">';
             liElementToInsert += '<span>' + framework.caption + '</span>';
-            liElementToInsert += '<input type="text" class="data-change caption" id="edit-caption-' + element['id'] + '" data-change="caption" value="'+element['caption']+'">';
+            liElementToInsert += '<input type="text" class="data-change caption" id="edit-caption-' + element['id'] + '" data-change="caption" value="'+ htEscapeHtml(element['caption']) +'">';
             liElementToInsert += '</label>';
             liElementToInsert += '<label class="setting" data-setting="alt">';
             liElementToInsert += '<span>' + framework.alt + '</span>';
-            liElementToInsert += '<input type="text" class="data-change alt" id="edit-alt-' + element['id'] + '" data-change="alt" value="'+element['alt']+'">';
+            liElementToInsert += '<input type="text" class="data-change alt" id="edit-alt-' + element['id'] + '" data-change="alt" value="'+ htEscapeHtml(element['alt']) +'">';
             liElementToInsert += '</label>';
             liElementToInsert += '<label class="setting" data-setting="description">';
             liElementToInsert += '<span>' + framework.description + '</span>';
-            liElementToInsert += '<input type="text" class="data-change description" id="edit-description-' + element['id'] + '" data-change="description" value="'+element['description']+'">';
+            liElementToInsert += '<input type="text" class="data-change description" id="edit-description-' + element['id'] + '" data-change="description" value="'+ htEscapeHtml(element['description']) +'">';
             liElementToInsert += '</label>';
             if(framework.video_url_support){
                 liElementToInsert += '<label class="setting" data-setting="video">';
@@ -800,6 +800,26 @@ function arrayUnique(array) {
 
     return a;
 };
+
+
+//adapted from http://stackoverflow.com/questions/24816/escaping-html-strings-with-jquery
+
+var htEscapedHTMLEntityMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': '&quot;',
+    "'": '&#39;',
+    "/": '&#x2F;'
+  };
+
+function htEscapeHtml(string) {
+    return String(string).replace(/[&<>"'\/]/g, function (s) {
+      return htEscapedHTMLEntityMap[s];
+    });
+  }
+
+
 
 
 
