@@ -1,0 +1,359 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Heroic Gallery Manager\n"
+"POT-Creation-Date: 2015-03-30 15:03-0000\n"
+"PO-Revision-Date: 2015-03-30 15:03-0000\n"
+"Last-Translator: \n"
+"Language-Team: Hero Themes\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.3\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x1,2c;_ex:1,2c\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../ht-gallery-manager.php:100
+msgid "Heroic Gallery Categories"
+msgstr ""
+
+#: ../ht-gallery-manager.php:101
+msgid "All Heroic Gallery Categories"
+msgstr ""
+
+#: ../ht-gallery-manager.php:102
+msgid "Parent Heroic Gallery Category"
+msgstr ""
+
+#: ../ht-gallery-manager.php:103
+msgid "Parent Heroic Gallery Category:"
+msgstr ""
+
+#: ../ht-gallery-manager.php:104
+msgid "New Heroic Gallery Category"
+msgstr ""
+
+#: ../ht-gallery-manager.php:105
+msgid "Add New Heroic Gallery Category"
+msgstr ""
+
+#: ../ht-gallery-manager.php:106
+msgid "Edit Heroic Gallery Category"
+msgstr ""
+
+#: ../ht-gallery-manager.php:107
+msgid "Update Heroic Gallery Category"
+msgstr ""
+
+#: ../ht-gallery-manager.php:108
+msgid "Separate Heroic Gallery Categories with commas"
+msgstr ""
+
+#: ../ht-gallery-manager.php:109
+msgid "Search Heroic Gallery Categories"
+msgstr ""
+
+#: ../ht-gallery-manager.php:110
+msgid "Add or remove categories"
+msgstr ""
+
+#: ../ht-gallery-manager.php:111
+msgid "Choose from the most used categories"
+msgstr ""
+
+#: ../ht-gallery-manager.php:132
+msgid "Heroic Gallery"
+msgstr ""
+
+#: ../ht-gallery-manager.php:133
+msgid "Heroic Galleries"
+msgstr ""
+
+#: ../ht-gallery-manager.php:137 ../ht-gallery-manager.php:138
+msgid "Add New"
+msgstr ""
+
+#: ../ht-gallery-manager.php:139
+msgid "Edit"
+msgstr ""
+
+#: ../ht-gallery-manager.php:140
+msgid "New"
+msgstr ""
+
+#: ../ht-gallery-manager.php:141 ../php/ht-gallery-widgets.php:171
+msgid "All"
+msgstr ""
+
+#: ../ht-gallery-manager.php:142
+msgid "View"
+msgstr ""
+
+#: ../ht-gallery-manager.php:143
+msgid "Search"
+msgstr ""
+
+#: ../ht-gallery-manager.php:144
+#, php-format
+msgid "No %s found"
+msgstr ""
+
+#: ../ht-gallery-manager.php:145
+#, php-format
+msgid "No %s found in trash"
+msgstr ""
+
+#: ../ht-gallery-manager.php:238
+msgid "Gallery Description"
+msgstr ""
+
+#: ../ht-gallery-manager.php:245
+msgid "Gallery Excerpt"
+msgstr ""
+
+#: ../ht-gallery-manager.php:249
+msgid "Heroic Gallery Shortcode Information"
+msgstr ""
+
+#: ../ht-gallery-manager.php:257
+msgid "Heroic Gallery Images"
+msgstr ""
+
+#: ../ht-gallery-manager.php:269
+msgid "Like Hero Themes?"
+msgstr ""
+
+#: ../ht-gallery-manager.php:361
+#, php-format
+msgid ""
+"To use this Heroic Gallery enter the shortcode <b>[ht_gallery id=\"%s\" name="
+"\"%s\"]</b> in your post or page or use the Insert Heroic Gallery button."
+msgstr ""
+
+#: ../ht-gallery-manager.php:364
+#, php-format
+msgid ""
+"As you are using a theme that supports the Heroic Gallery Manager, you only "
+"need to use this shortcode to display images inline in posts and can link "
+"directly to this %sHeroic Gallery%s."
+msgstr ""
+
+#: ../ht-gallery-manager.php:366
+msgid ""
+"The current theme does not support Heroic Gallery Manager, you will need to "
+"use this shortcode to display galleries in posts."
+msgstr ""
+
+#: ../ht-gallery-manager.php:397
+msgid "Want even more from your Heroic Gallery?"
+msgstr ""
+
+#: ../ht-gallery-manager.php:403
+msgid "Learn More"
+msgstr ""
+
+#: ../ht-gallery-manager.php:434 ../ht-gallery-manager.php:458
+#: ../ht-gallery-manager.php:481
+msgid "Add Images"
+msgstr ""
+
+#: ../ht-gallery-manager.php:437 ../ht-gallery-manager.php:484
+msgid "Refresh Images"
+msgstr ""
+
+#: ../ht-gallery-manager.php:449 ../ht-gallery-manager.php:496
+msgid "Items in Gallery"
+msgstr ""
+
+#: ../ht-gallery-manager.php:457
+msgid "Gallery Empty"
+msgstr ""
+
+#: ../ht-gallery-manager.php:458
+msgid "Select Images"
+msgstr ""
+
+#: ../ht-gallery-manager.php:465
+msgid "Loading Images"
+msgstr ""
+
+#: ../ht-gallery-manager.php:473
+msgid "Drop files here to add to gallery"
+msgstr ""
+
+#: ../ht-gallery-manager.php:524 ../php/ht-gallery-widgets.php:161
+#: ../php/ht-gallery-widgets.php:191
+msgid "Title"
+msgstr ""
+
+#: ../ht-gallery-manager.php:525
+msgid "Caption"
+msgstr ""
+
+#: ../ht-gallery-manager.php:526
+msgid "Alternative Text"
+msgstr ""
+
+#: ../ht-gallery-manager.php:528
+msgid "Description"
+msgstr ""
+
+#: ../ht-gallery-manager.php:529
+msgid "Video URL (YouTube or Vimeo)"
+msgstr ""
+
+#: ../ht-gallery-manager.php:530
+msgid "appears not be a valid YouTube or Vimeo URL"
+msgstr ""
+
+#: ../ht-gallery-manager.php:584
+msgid "Columns value is not a number"
+msgstr ""
+
+#: ../ht-gallery-manager.php:596
+#, php-format
+msgid "The Heroic Gallery with the name %s is empty."
+msgstr ""
+
+#: ../ht-gallery-manager.php:600
+#, php-format
+msgid "There is no Heroic Gallery with the name %s."
+msgstr ""
+
+#: ../ht-gallery-manager.php:612
+#, php-format
+msgid "The Heroic Gallery with the id %s is empty."
+msgstr ""
+
+#: ../ht-gallery-manager.php:616
+#, php-format
+msgid "There is no Heroic Gallery with the id %s."
+msgstr ""
+
+#: ../ht-gallery-manager.php:619
+msgid "Could not get Heroic Gallery"
+msgstr ""
+
+#: ../ht-gallery-manager.php:643
+msgid "Image Files"
+msgstr ""
+
+#: ../ht-gallery-manager.php:714
+msgid "Add Heroic Gallery"
+msgstr ""
+
+#: ../ht-gallery-manager.php:727
+msgid "Insert a Heroic Gallery"
+msgstr ""
+
+#: ../ht-gallery-manager.php:728
+msgid "Add a Heroic Gallery to the current post"
+msgstr ""
+
+#: ../ht-gallery-manager.php:753
+msgid "Columns"
+msgstr ""
+
+#: ../ht-gallery-manager.php:766
+#, php-format
+msgid "%d Images in Gallery"
+msgstr ""
+
+#: ../ht-gallery-manager.php:841
+msgid "ID"
+msgstr ""
+
+#: ../ht-gallery-manager.php:844
+msgid "Preview"
+msgstr ""
+
+#: ../ht-gallery-manager.php:847 ../php/ht-gallery-widgets.php:194
+msgid "Order"
+msgstr ""
+
+#: ../ht-gallery-manager.php:1029 ../ht-gallery-manager.php:1064
+msgid "Heroic Galleries Archive"
+msgstr ""
+
+#: ../ht-gallery-manager.php:1084
+msgid "Add to Menu"
+msgstr ""
+
+#: ../php/ht-gallery-manager-settings.php:17
+msgid "gallery"
+msgstr ""
+
+#: ../php/ht-gallery-manager-settings.php:49
+msgid "Heroic Gallery Settings"
+msgstr ""
+
+#: ../php/ht-gallery-manager-settings.php:50
+#: ../php/ht-gallery-manager-settings.php:72
+msgid "Settings"
+msgstr ""
+
+#: ../php/ht-gallery-manager-settings.php:101
+#: ../php/ht-gallery-manager-settings.php:109
+#: ../php/ht-gallery-manager-settings.php:186
+msgid "Gallery Slug"
+msgstr ""
+
+#: ../php/ht-gallery-manager-settings.php:117
+#: ../php/ht-gallery-widgets.php:168
+msgid "Category"
+msgstr ""
+
+#: ../php/ht-gallery-manager-settings.php:125
+#: ../php/ht-gallery-manager-settings.php:132
+msgid "Post Limit"
+msgstr ""
+
+#: ../php/ht-gallery-manager-settings.php:166
+msgid "The slugs cannot be the same."
+msgstr ""
+
+#: ../php/ht-gallery-manager-settings.php:170
+msgid "The post limit must be numeric"
+msgstr ""
+
+#: ../php/ht-gallery-manager-settings.php:214
+msgid "Heroic Gallery Posts Limit"
+msgstr ""
+
+#: ../php/ht-gallery-widgets.php:20
+msgid "Heroic Gallery Widget"
+msgstr ""
+
+#: ../php/ht-gallery-widgets.php:23
+msgid "A widget for displaying a heroic gallery."
+msgstr ""
+
+#: ../php/ht-gallery-widgets.php:180
+msgid "Number of galleries to show"
+msgstr ""
+
+#: ../php/ht-gallery-widgets.php:187
+msgid "Sort by"
+msgstr ""
+
+#: ../php/ht-gallery-widgets.php:190
+msgid "Date"
+msgstr ""
+
+#: ../php/ht-gallery-widgets.php:192
+msgid "Random"
+msgstr ""
+
+#: ../php/ht-gallery-widgets.php:193
+msgid "Modified"
+msgstr ""
+
+#: ../php/ht-gallery-widgets.php:204
+msgid "Reverse sort order (ascending)"
+msgstr ""
+
+#: ../php/ht-gallery-widgets.php:209
+msgid "Excluded Galleries (ex. 1,2,3)"
+msgstr ""
